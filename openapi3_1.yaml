@@ -1,7 +1,7 @@
-openapi: 3.1.0
+openapi: "3.0.3"
 info:
-  title: Budavár Tours szervezett utak - OpenAPI 3.1
-  
+  title: Budavár Tours szervezett utak - OpenAPI 3.0.3
+
   version: 1.1.0
 externalDocs:
   description: Budavár Tours REST API leírás
@@ -9,26 +9,26 @@ externalDocs:
 servers:
   - url: "https://teszt.budavartours.hu/api/v1"
 tags:
-  - name: "törzsadat"
+  - name: "törzsadatok"
     description: "Az utazási programok felépítéséhez nélülözhetetlen alapadatok"
-  - name: "utazási program"
-    description: "Az egyes utazási programokat összefogó objektum" 
-  - name: "árak"
-    description: "Az egyes utazási programokhoz tartozó árak, kedvezményes árak"
-  - name: "felhasználó"
-    description: "A felhasználóra vonatkozó statisztikák és műveletek"
-  - name: "hitelesítés"
-    description: "A felhasználó hitelesítését kezelő hívások"
-  - name: "esemény vezérelt szolgáltatás"
+  # - name: "utazási programok"
+  #   description: "Az egyes utazási programokat összefogó objektum"
+  # - name: "árak"
+  #   description: "Az egyes utazási programokhoz tartozó árak, kedvezményes árak"
+  # - name: "felhasználók"
+  #   description: "A felhasználóra vonatkozó statisztikák és műveletek"
+  # - name: "hitelesítések"
+  #   description: "A felhasználó hitelesítését kezelő hívások"
+  # - name: "esemény vezérelt szolgáltatások"
 paths:
   /users:
     get:
       tags:
-      - felhasználó
+        - felhasználó
       summary: Az aktuális felhasználóra vonatkozó statisztikákat adja vissza
       description: |-
         Az aktuálisan bejelentkezett felhasználóra vonatkozó adoatok és statisztikák  
-        
+
         **Adatok**  
           - felhasználó név
           - kapcsolattartó email cím
@@ -46,1902 +46,1631 @@ paths:
           - utolsó 24 óra hibás szever válaszainak száma
           - utolsó 24 óra átlagos válaszideje
       responses:
-        '200':
+        "200":
           description: Sikeres belépés
-  /users/login:
-    post:
-      tags:
-        - felhasználó
-        - hitelesítés
-      summary: A felhasználó bejelentkezési kérése
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
+  # /users/login:
+  #   post:
+  #     tags:
+  #       - felhasználó
+  #       - hitelesítés
+  #     summary: A felhasználó bejelentkezési kérése
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               username:
+  #                 type: string
+  #                 maxLength: 128
+  #               password:
+  #                 type: string
+  #                 maxLength: 256
+  #                 format: password
+  #             required:
+  #               - username
+  #               - password
+  #     responses:
+  #       '200':
+  #         description: Sikeres belépés
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 token:
+  #                   type: string
+  #                   description: Hitelesítési token
+  #       '401':
+  #         description: "A hitelesítés nem sikerült: hibás a felhasználó vagy a jelszó"
+  # /users/logout:
+  #   delete:
+  #     tags:
+  #       - felhasználó
+  #       - hitelesítés
+  #     summary: A hitelesítési token érvénytelenítése (kilépés)
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #     responses:
+  #       '200':
+  #         description: Sikeres kilépés
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+  # /users/subscribes:
+  #   get:
+  #     tags:
+  #       - felhasználó
+  #       - "esemény vezérelt szolgáltatás"
+  #     summary: Lista, amely a felhasználó által feliratkozott, aktív szervereseményeket tartalmazza
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #     responses:
+  #       '200':
+  #         description: Lista generálás
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               item:
+  #                 type: object
+  #                 properties:
+  #                   "#":
+  #                     type: integer
+  #                     format: int32
+  #                     example: 1
+  #                   "name":
+  #                     type: string
+  #                     example: "Teljes frissítés: javasolt"
+  #                   "callbackURI":
+  #                     type: string
+  #                     format: uri
+  #                     example: "https://api.kulsoszerver.hu/v1/teljes-frissites-inditasa"
+  #                   "subscribeDate":
+  #                     type: string
+  #                     format: date
+  #                     example: 2023-01-01
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+
+  # /utils:
+  #   get:
+  #     tags:
+  #     - eszközök
+  #     - "esemény vezérelt szolgáltatás"
+  #     summary: Lista
+  #     description: |-
+  #       A szerveren, bejelentkezett felhasználók számára elérhető eszközök listája az adatok egyszerűbb átadására.
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #     responses:
+  #       '200':
+  #         description: Sikeres lista generálás
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               item:
+  #                 type: object
+  #                 properties:
+  #                   "#":
+  #                     type: integer
+  #                     format: int32
+  #                   "requestPath":
+  #                     type: string
+  #                   "requestParameters":
+  #                     type: string
+  #                   "description":
+  #                     type: string
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+
+  # /utils/status:
+  #   get:
+  #     tags:
+  #     - eszközök
+  #     - "esemény vezérelt szolgáltatás"
+  #     summary: A szerver aktuális statisztikái
+  #     description: |-
+  #       A szerver utolsó 1 órájának az átlag mutatói:
+  #       - válaszidő
+  #       - terheltség %-ban
+  #       - javasolt teljes adatlekérés?
+  #       - javasolt objektumok lekérése?
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #     responses:
+  #       '200':
+  #         description: Sikeres generálás
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               item:
+  #                 minItems: 4
+  #                 maxItems: 4
+  #                 type: object
+  #                 properties:
+  #                   "#":
+  #                     type: integer
+  #                     format: int32
+  #                     example: 1
+  #                   "measurement":
+  #                     type: string
+  #                     example: "Is full update recommended?"
+  #                   "quantity":
+  #                     oneOf:
+  #                     - type: number
+  #                       format: float
+  #                       example: 284.65
+  #                     - type: string
+  #                       description: Szabadszavas szöveg
+  #                       example: "Ft/kWh"
+  #                     - type: string
+  #                       enum: ["recommended", "not recommended"]
+  #                       description: A szerver terheltségétől függő információk eredménye
+  #                       example: "recommended"
+  #                   "unit":
+  #                     type: string
+  #                     example: "-"
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+
+  # /utils/status/requests/:
+  #   get:
+  #     tags:
+  #     - eszközök
+  #     summary: Segédútvonal a REST API szabványos struktúrájához.
+  #     responses:
+  #       '204':
+  #         description: Nincs tartalom
+
+  # /utils/status/requests/{requestID}:
+  #   get:
+  #     tags:
+  #     - eszközök
+  #     - "esemény vezérelt szolgáltatás"
+  #     summary: A szervernek küldött kérés státusza
+  #     description: |-
+  #       A felhasználó ellenőrizheti az egyes kéréseinek a státuszát, amennyiben az túl hosszú ideig elhúzódik.
+  #       **Az egyes státuszok:**
+  #         - **unknown**: a kérés az adott azonosítóval nem létezik vagy idő közben befejeződött
+  #         - **in queue**: a kérés sorban áll a futtatáshoz
+  #         - **in progress**: a kérést az adatbázis szerver épp feldolgozza
+  #         - **response in progress**: a válasz átadása folyamatban van
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #       - in: path
+  #         name: requestID
+  #         schema:
+  #           type: string
+  #           format: urid
+  #           example: AAAA-BBBB-CCCC-DDDD-EEEE
+  #         required: true
+  #         description: Kérés azonosító
+  #     responses:
+  #       '200':
+  #         description: Sikeres státusz lekérés
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: string
+  #               enum: ["unknown","in queue","in progress","response in progress"]
+  #               description: |-
+  #                 Az egyes státuszok:
+  #                   - "unknown": a kérés az adott azonosítóval nem létezik vagy idő közben befejeződött
+  #                   - "in queue": a kérés sorban áll a futtatáshoz
+  #                   - "in progress": a kérést az adatbázis szerver épp feldolgozza
+  #                   - "response in progress": a válasz átadása folyamatban van
+  #               example: "in queue"
+
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+
+  # /utils/subscribes:
+  #   get:
+  #     tags:
+  #     - eszközök
+  #     - "esemény vezérelt szolgáltatás"
+  #     - "esemény kezelés"
+  #     summary: A szervereseményeket kezelő hívások
+  #     description: |-
+  #       A felhasználó feliratkozhat bizonyos szerver eseményekre. Az események megtörténtekor a Budavár Tours API szerver meghívja a felhasználó által megadott URI-t.
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #       - in: query
+  #         name: offset
+  #         schema:
+  #           type: integer
+  #         description: A lista oldalszámát megadó paraméter
+  #       - in: query
+  #         name: limit
+  #         schema:
+  #           type: integer
+  #         description: A lista oldalain lévő elemek számát megadó paraméter. Max. 30
+  #     responses:
+  #       '200':
+  #         description: A felhasználó számára elérhető szerveresemények listája
+  #         headers:
+  #           x-next:
+  #             description: A lista következő N elemét tartlamazó hivatkozás
+  #             schema:
+  #               type: string
+  #               example: "https://api.budavartours.hu/api/v1/utils/subscribe?offset=1&limit=30"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               minItems: 0
+  #               maxItems: 50
+  #               default: 30
+  #               items:
+  #                 type: object
+  #                 properties:
+  #                   "eventID":
+  #                     type: integer
+  #                     format: int64
+  #                     example: 111275843
+  #                   "eventName":
+  #                     type: string
+  #                     enum: ["onFullUpdateRecommended","onParitalUpdateRecommended"]
+  #                     example: "onFullUpdateRecommended"
+  #                   "description":
+  #                     type: string
+  #                     example: "If server load drops below 20%"
+  #                   "isAlreadySubscribed":
+  #                     type: boolean
+  #                   "callbackURI":
+  #                     oneOf:
+  #                       - type: string
+  #                         format: uri
+  #                         example: "https://api.example.com/v1/BUDAVARTOURS/startFullUpdate"
+  #                       - type: string
+  #                         enum: ["null"]
+  #                   "subscribeDate":
+  #                     type: string
+  #                     format: date
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+
+  # /utils/subscribes/{eventID}:
+  #   post:
+  #     tags:
+  #     - eszközök
+  #     - "esemény vezérelt szolgáltatás"
+  #     - "szerveresemény kezelés"
+  #     summary: A szervereseményre feliratkozás
+  #     description: |-
+  #       A felhasználó feliratkozhat bizonyos szerver eseményekre. Az események megtörténtekor a Budavár Tours API szerver meghívja a felhasználó által megadott URI-t.
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #       - in: path
+  #         name: eventID
+  #         schema:
+  #           type: integer
+  #           format: int64
+  #         required: true
+  #         description: A szerveresemény egyedi azonosítója
+  #     requestBody:
+  #       description: Optional description in *Markdown*
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               callbackURI:
+  #                 type: string
+  #                 format: uri
+  #     responses:
+  #       '201':
+  #         description: A felhasználó feliratkozása sikeresen megtörtént
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 name:
+  #                   type: string
+  #                 eventID:
+  #                   type: integer
+  #                   format: int64
+  #                 callbackURI:
+  #                   type: string
+  #                   format: uri
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+  #   put:
+  #     tags:
+  #     - eszközök
+  #     - "esemény vezérelt szolgáltatás"
+  #     - "szerveresemény kezelés"
+  #     summary: A szerveresemény feliratkozás frissítése
+  #     description: |-
+  #       A felhasználó feliratkozhat bizonyos szerver eseményekre. Az események megtörténtekor a Budavár Tours API szerver meghívja a felhasználó által megadott URI-t.
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #       - in: path
+  #         name: eventID
+  #         schema:
+  #           type: integer
+  #           format: int64
+  #         required: true
+  #         description: A szerveresemény egyedi azonosítója
+  #     requestBody:
+  #       description: Optional description in *Markdown*
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               callbackURI:
+  #                 type: string
+  #                 format: uri
+  #     responses:
+  #       '201':
+  #         description: A felhasználó feliratkozásának frissítése sikeresen megtörtént
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 name:
+  #                   type: string
+  #                 eventID:
+  #                   type: integer
+  #                   format: int64
+  #                 callbackURI:
+  #                   type: string
+  #                   format: uri
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+  #   delete:
+  #     tags:
+  #     - eszközök
+  #     - "esemény vezérelt szolgáltatás"
+  #     - "szerveresemény kezelés"
+  #     summary: A szerveresemény feliratkozás frissítése
+  #     description: |-
+  #       A felhasználó feliratkozhat bizonyos szerver eseményekre. Az események megtörténtekor a Budavár Tours API szerver meghívja a felhasználó által megadott URI-t.
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #       - in: path
+  #         name: eventID
+  #         schema:
+  #           type: integer
+  #           format: int64
+  #         required: true
+  #         description: A szerveresemény egyedi azonosítója
+  #     requestBody:
+  #       description: Optional description in *Markdown*
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               callbackURI:
+  #                 type: string
+  #                 format: uri
+  #     responses:
+  #       '204':
+  #         description: A felhasználó feliratkozásának törlése sikeresen megtörtént
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+
+  # /utils/priorityTimeWindows/{timeWindowID}:
+  #   get:
+  #     tags:
+  #     - eszközök
+  #     - "esemény vezérelt szolgáltatás"
+  #     - "magas prioritású szerver rendelkezésre állás"
+  #     summary: A szerver szabad beosztásásának lekérdezése
+  #     description: |-
+  #       A felhasználónak lehetősége van *magas prioritású időablakot* igényelni. A megadott időablakban a felhasználó által küldött kérések magas prioritásban hajtódnak végre.
+  #       A hívás a 'magas prioritású időpontok' rejndjét adja vissza.
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #     responses:
+  #       '200':
+  #         description: A 'magas prioritású időpontok' rendje
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               minitems: 1
+  #               items:
+  #                 type: object
+  #                 properties:
+  #                   startTime:
+  #                     type: string
+  #                     format: date-time
+  #                     description: Az időablak kezdete
+  #                   startEnd:
+  #                     type: string
+  #                     format: date-time
+  #                     description: Az időablak vége, alapértelmezetten 10 perc időtartamú az ablak
+  #                   isReserved:
+  #                     type: boolean
+  #                     description: |-
+  #                       Az időablak foglalható vagy sem?
+  #                       true = foglalható
+  #                       false = nem foglalható
+  #                   timeWindowID:
+  #                     type: integer
+  #                     format: int64
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+  #   post:
+  #     tags:
+  #     - eszközök
+  #     - "esemény vezérelt szolgáltatás"
+  #     - "magas prioritású szerver rendelkezésre állás"
+  #     summary: Egy 'magas prioritású időpont' lefoglalása a felhasználó számára
+  #     description: |-
+  #       A felhasználónak lehetősége van 'magas prioritású időablakot' igényelni. A megadott időablakban a felhasználó által küldött kérések magas prioritásban hajtódnak végre.
+  #       A hívás segítségével egy időablakot lehet lefoglalni.
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #       - in: path
+  #         name: timeWindowID
+  #         schema:
+  #           type: integer
+  #           format: int64
+  #         required: true
+  #         description: Az időablak egyedi azonosítója
+  #     responses:
+  #       '200':
+  #         description: Az időablak már lefoglalásra került (az aktuális felhasználó által).
+  #       '201':
+  #         description: Az időablak foglalása sikeresen megtörtént
+  #         content:
+  #           application/json:
+  #             schema:
+  #               startTime:
+  #                 type: string
+  #                 format: date-time
+  #                 description: Az időablak kezdete
+  #               startEnd:
+  #                 type: string
+  #                 format: date-time
+  #                 description: Az időablak vége, alapértelmezetten 10 perc időtartamú az ablak
+  #               isReserved:
+  #                 type: boolean
+  #                 description: |-
+  #                   Az időablak foglalható vagy sem?
+  #                   true = foglalható
+  #                   false = nem foglalható
+  #               timeWindowID:
+  #                 type: integer
+  #                 format: int64
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+  #       '409':
+  #         description: Az időablak már foglalt (egy másik felhasználó által).
+  #   delete:
+  #     tags:
+  #     - eszközök
+  #     - "esemény vezérelt szolgáltatás"
+  #     - "magas prioritású szerver rendelkezésre állás"
+  #     summary: Egy, már lefoglalt 'magas prioritású időpont' felszabadítása a foglaltság alól
+  #     description: |-
+  #       A felhasználónak lehetősége van 'magas prioritású időablakot' igényelni. A megadott időablakban a felhasználó által küldött kérések magas prioritásban hajtódnak végre.
+  #       A hívás segítségével egy, korábban lefoglalt időablakot lehet szabaddá tenni. A szabaddá tételét az időablak kezdetéig lehet megtenni, kizárólag a foglalást intéző felhasználó által.
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #       - in: path
+  #         name: timeWindowID
+  #         schema:
+  #           type: integer
+  #           format: int64
+  #         required: true
+  #         description: Az időablak egyedi azonosítója
+  #     responses:
+  #       '200':
+  #         description: Az időablak már felszabadításra került (az aktuális felhasználó által).
+  #       '201':
+  #         description: Az időablak felszabadítása sikeresen megtörtént
+  #         content:
+  #           application/json:
+  #             schema:
+  #               startTime:
+  #                 type: string
+  #                 format: date-time
+  #                 description: Az időablak kezdete
+  #               startEnd:
+  #                 type: string
+  #                 format: date-time
+  #                 description: Az időablak vége, alapértelmezetten 10 perc időtartamú az ablak
+  #               isReserved:
+  #                 type: boolean
+  #                 description: |-
+  #                   Az időablak foglalható vagy sem?
+  #                   true = foglalható
+  #                   false = nem foglalható
+  #               timeWindowID:
+  #                 type: integer
+  #                 format: int64
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+  #       '409':
+  #         description: Az időablak már foglalt (egy másik felhasználó által).
+
+  # /data/base:
+  #   get:
+  #     tags:
+  #     - törzsadatok
+  #     - alapadatok
+  #     summary: A különböző típusú törzsadatok teljes listája
+  #     description: |-
+  #       Az utak teljes felépítéséhez az alapadatok adják a gerincet. Az alapadatok a törzsadatokból (*/data/base* hívás alatti hívások) és a lokációkból (*/data/base/locations* hívás alatti hívások) áll.
+  #       **A hívás a teljes törzsadat listát adja vissza.**
+  #       Ezt a listát érdemes ritkán frissíteni, mivel a */data/base/descriptions* (az egyes elemek leírását tartalmazó hívás) elemei is szerepelnek benne és tartalmuk nagy méretű is lehet. A lista összes elemének letöltése előtt javasolt a */utils/priorityTimeWindows/* hívás segítségével egy 'magas prioritású időablakot' igényelni, így sokkal kisebb az esélye egy *504 Gateway Timeout* válasznak.
+
+  #       Rendszeres frissítés esetén érdemes a */data/history* hívást használni, ami megadja az utóbbi maximum 48 órában megváltozott objektumok listáját.
+
+  #       Alternatívaként használható a */utils/subscribe* hívás, amely segítségével feliratkozhatunk az *objectUpdated* eseményre. Ez az esemény egy megadott objektum módosulása (frissítés vagy törlés) esetén meghív egy külső URI-t, így a partner szervere valós időben értesül az eseményről.
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #     responses:
+  #       '200':
+  #         description: A törzsadatok listája
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               minitems: 1
+  #               uniqueItems: true
+  #               items:
+  #                 type: object
+  #                 properties:
+  #                   self:
+  #                     type: string
+  #                     format: uri
+  #                     example: "#/data/options/stornoPrice"
+  #                   type:
+  #                     type: string
+  #                     enum: ["options", "descriptions", "basicData", "tags"]
+  #                   name:
+  #                     type: string
+  #                     minLength: 3
+  #                     maxlength: 128
+  #                     example: "Sztornó"
+  #                   descriptionID:
+  #                     type: string
+  #                     format: uri
+  #                     example: "#/data/description/stornoPrice"
+  #                   value:
+  #                     oneOf:
+  #                       - type: string
+  #                       - type: number
+  #                   additionalProperties: {}
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+
+  # /data/base/options/{baseID*}:
+  #   parameters:
+  #     - name: baseID
+  #       in: path
+  #       description: A törzsadat(ok) azonosítója
+  #       required: true
+  #       schema:
+  #         type: integer
+  #         format: int32
+  #         example: 345
+  #   get:
+  #     summary: A törzsadat(ok) listájának lekérése
+  #     tags:
+  #       - törzsadatok
+  #       - alapadatok
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #     responses:
+  #       '200':
+  #         description: Sikeres lekérdezés
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               minItems: 1
+  #               items:
+  #                 oneOf:
+  #                 - $ref: "#/components/schemas/serverMessages"
+  #                 - $ref: '#/components/schemas/options'
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+
+  # /data/base/descriptions/{baseID*}:
+  #   parameters:
+  #     - name: baseID
+  #       in: path
+  #       description: A törzsadat(ok) azonosítója
+  #       required: true
+  #       schema:
+  #         type: integer
+  #         format: int32
+  #         example: 345
+  #   get:
+  #     summary: A törzsadat(ok) listájának lekérése
+  #     tags:
+  #       - törzsadatok
+  #       - alapadatok
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #     responses:
+  #       '200':
+  #         description: Sikeres lekérdezés
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               minItems: 1
+  #               items:
+  #                 oneOf:
+  #                 - $ref: "#/components/schemas/serverMessages"
+  #                 - $ref: '#/components/schemas/descriptions'
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+
+  #                 # oneOf:
+  #                 # - $ref: "#/components/schemas/serverMessages"
+  #                 # - $ref: '#/components/schemas/options'
+  #                 # - $ref: '#/components/schemas/descriptions'
+  #                 # - $ref: '#/components/schemas/basicDatas'
+  #                 # - $ref: '#/components/schemas/tags'
+
+  # /data/base/basicDatas/{baseID*}:
+  #   parameters:
+  #     - name: baseID
+  #       in: path
+  #       description: A törzsadat(ok) azonosítója
+  #       required: true
+  #       schema:
+  #         type: integer
+  #         format: int32
+  #         example: 345
+  #   get:
+  #     summary: A törzsadat(ok) listájának lekérése
+  #     tags:
+  #       - törzsadatok
+  #       - alapadatok
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #     responses:
+  #       '200':
+  #         description: Sikeres lekérdezés
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               minItems: 1
+  #               items:
+  #                 oneOf:
+  #                 - $ref: '#/components/schemas/serverMessages'
+  #                 - $ref: '#/components/schemas/basicDatas'
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+
+  # /data/base/tags/{baseID*}:
+  #   parameters:
+  #     - name: baseID
+  #       in: path
+  #       description: A törzsadat(ok) azonosítója
+  #       required: true
+  #       schema:
+  #         type: integer
+  #         format: int32
+  #         example: 345
+  #   get:
+  #     summary: A törzsadat(ok) listájának lekérése
+  #     tags:
+  #       - törzsadatok
+  #       - alapadatok
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #     responses:
+  #       '200':
+  #         description: Sikeres lekérdezés
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               minItems: 1
+  #               items:
+  #                 oneOf:
+  #                 - $ref: '#/components/schemas/serverMessages'
+  #                 - $ref: '#/components/schemas/tags'
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+
+  # /locations/cities/{locationID*}:
+  #   parameters:
+  #     - name: locationID
+  #       in: path
+  #       description: A lokáció(k) azonosítója
+  #       required: true
+  #       schema:
+  #         type: integer
+  #         format: int32
+  #         example: 345
+  #   get:
+  #     summary: A lokáció(k) listájának lekérése
+  #     tags:
+  #       - törzsadatok
+  #       - alapadatok
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #     responses:
+  #       '200':
+  #         description: Sikeres lekérdezés
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               minItems: 1
+  #               items:
+  #                 oneOf:
+  #                 - $ref: '#/components/schemas/serverMessages'
+  #                 - $ref: '#/components/schemas/locations'
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+
+  # /locations/regions/{locationID*}:
+  #   parameters:
+  #     - name: locationID
+  #       in: path
+  #       description: A lokáció(k) azonosítója
+  #       required: true
+  #       schema:
+  #         type: integer
+  #         format: int32
+  #         example: 345
+  #   get:
+  #     summary: A lokáció(k) listájának lekérése
+  #     tags:
+  #       - törzsadatok
+  #       - alapadatok
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #     responses:
+  #       '200':
+  #         description: Sikeres lekérdezés
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               minItems: 1
+  #               items:
+  #                 oneOf:
+  #                 - $ref: '#/components/schemas/serverMessages'
+  #                 - $ref: '#/components/schemas/locations'
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+
+  # /locations/countries/{locationID*}:
+  #   parameters:
+  #     - name: locationID
+  #       in: path
+  #       description: A lokáció(k) azonosítója
+  #       required: true
+  #       schema:
+  #         type: integer
+  #         format: int32
+  #         example: 345
+  #   get:
+  #     summary: A lokáció(k) listájának lekérése
+  #     tags:
+  #       - törzsadatok
+  #       - alapadatok
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #     responses:
+  #       '200':
+  #         description: Sikeres lekérdezés
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               minItems: 1
+  #               items:
+  #                 oneOf:
+  #                 - $ref: '#/components/schemas/serverMessages'
+  #                 - $ref: '#/components/schemas/locations'
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+
+  # /locations/accomodations/{locationID*}:
+  #   parameters:
+  #     - name: locationID
+  #       in: path
+  #       description: A lokáció(k) azonosítója
+  #       required: true
+  #       schema:
+  #         type: integer
+  #         format: int32
+  #         example: 345
+  #   get:
+  #     summary: A lokáció(k) listájának lekérése
+  #     tags:
+  #       - törzsadatok
+  #       - alapadatok
+  #       - szálláshelyek
+  #     parameters:
+  #       - in: header
+  #         name: Authorization
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: Hitelesítési token
+  #     responses:
+  #       '200':
+  #         description: Sikeres lekérdezés
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               minItems: 1
+  #               items:
+  #                 oneOf:
+  #                 - $ref: '#/components/schemas/serverMessages'
+  #                 - $ref: '#/components/schemas/accomodations'
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+
+  # /programs/{programID*}:
+  #   parameters:
+  #     - name: programID
+  #       in: path
+  #       description: A program(ok) azonosítója
+  #       required: true
+  #       schema:
+  #         type: integer
+  #         format: int32
+  #         example: 345
+  #     - name: Authorization
+  #       in: header
+  #       schema:
+  #         type: string
+  #       required: true
+  #       description: Hitelesítési token
+  #   get:
+  #     summary: A program(ok) részleteinek lekérése
+  #     tags:
+  #       - utazási programok
+  #       - árak
+  #     responses:
+  #       '200':
+  #         description: Sikeres lekérdezés
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               minItems: 1
+  #               items:
+  #                 oneOf:
+  #                 - $ref: '#/components/schemas/serverMessages'
+  #                 - $ref: '#/components/schemas/progamScheme'
+  #       '401':
+  #         description: A felhasználónak a híváshoz nincs jogosultsága
+
+  # /programs/{programID*}/prices:
+  # /programs/{programID}/prices/{departureID*}:
+  # /departures/{departureID*}:
+
+  # /quicklists/locations:
+  # /quicklists/accomodations:
+  # /quicklists/programs:
+  # /quicklists/histories:
+
+  # /history/{objectID*}:
+
+components:
+  schemas:
+    id:
+      type: number
+      format: int64
+      description: Az objektum azonosítója
+      example: 3755
+
+    selfRef:
+      type: string
+      format: uri
+      description: Az objektumot azonosító REST API hívás, amely NEM tartlamazza a domaint és az api verziót.
+      example: "/data/base/basicDatas/3755"
+
+    serverMessages:
+      allOf:
+        - $ref: "#/components/schemas/id"
+        - $ref: "#/components/schemas/selfRef"
+        - type: object
+          properties:
+            status:
+              type: integer
+              format: int32
+              minimum: 100
+              maximum: 999
+              description: Szerver üzenethez tartozó HTTP kód
+              example: 404
+            message:
+              type: string
+              maxLength: 64
+              description: A hibakód rövid magyarázata
+              example: "Object not found"
+            description:
+              type: string
+              maxLength: 512
+              description: A hibakódhoz tartozó részletes leírás
+              example: "The object does not exist. Refresh baseData and try again"
+
+    options:
+      allOf:
+        - $ref: "#/components/schemas/id"
+        - type: object
+          properties:
+            name:
+              type: string
+              maxLength: 128
+              description: Az obejktum neve
+            value:
+              oneOf:
+                - type: string
                   maxLength: 128
-                password:
-                  type: string
-                  maxLength: 256
-                  format: password
+                - type: number
+                  format: float
+                  description: |-
+                    **Globális beállítás**  
+                    pl.: Sztornó százalék, HUF-EUR kurzus váltó, stb.
+                  example: 0.025
+            type:
+              type: string
+              enum: [STORNO, CURRENCY_CHANGE]
+              description: |-
+                A törzsadat típusának a neve.  
+                **Globális beállítás**  
+                 pl.: Sztornó százalék, HUF-EUR kurzus váltó, stb.
+              example: "option"
+
+    descriptions:
+      allOf:
+        - $ref: "#/components/schemas/id"
+        - type: object
+          properties:
+            content:
+              type: string
+              maxLength: 8192
+              description: "Egy objektumhoz tartozó, kiegészítő információkat tartalmazó, HTML előformázott szöveg"
+              example: |-
+                <p class=""><b class="">1. nap: Budapest-Korfu</b><br>  
+                Elutazás Korfura charterjárattal. Érkezés után transzfer a szállodába. Szabadprogram. Vacsora (amennyiben a program tartalmazza) és szállás Korfun. </p>...
+            type:
+              type: string
+              enum:
+                [
+                  CITY,
+                  REGION,
+                  COUNTY,
+                  OPTIONAL_PROGRAM,
+                  PROGRAM_SCHEME,
+                  ACCOMODATION,
+                  BASE_DATA,
+                ]
+              description: |-
+                A törzsadat típusának a neve.  
+                **Leírás törzsadat típus**  
+                A 'description' típusú törzsadathoz tartoznia KELL egy 'content' tulajdonság, ami magát a leírást tartalmazza, HMTL előformázott szövegként
+              example: "CITY"
+
+    basicDatas:
+      allOf:
+        - $ref: "#/components/schemas/id"
+        - type: object
+          properties:
+            name:
+              type: string
+              maxLength: 128
+              description: Az obejktum neve
+            type:
+              type: string
+              enum:
+                [
+                  CATERING,
+                  ADDITIONAL_ITEM,
+                  PROGRAM_TYPE,
+                  ACCOMODATION_RATE,
+                  ACCOMODATION_TYPE,
+                  ACCOMODATION_SERVICE,
+                  TRAVEL_TYPE,
+                ]
+              example: "ADDITIONAL_ITEM"
+              description: |
+                A törzsadat típusának a neve.
+                # Alap törzsadat típus
+                Olyan törzsadatok, amelyek leírással is rendelkeznek
+                  * `CATERING` - Ellátás megnevezése és leírása (pl.: önellátás, reggeli, félpanzió)
+                  * `ADDITIONAL_ITEM` - Felárak megnevezése és leírása (pl.: Elsőbbségi beszállás; Atlasz Classic Kalkulált biztosítás)
+                  * `PROGRAM_TYPE` - Program megnevezése és leírása (pl.: repülőjegy, hajóút, körutazás)
+                  * `ACCOMODATION_RATE` - Szállásbesorolás megnevezése és leírása (pl.: 2*+, A kategória, 5*)
+                  * `ACCOMODATION_TYPE` - Szállástípus megnevezése és leírása (pl.: apartman, hotel, butikhotel)
+                  * `ACCOMODATION_SERVICE` - Szállásszolgáltatás megnevezése és leírása. Ezekbe beletartoznak az szállás szoba- és sportszolgáltatásai is. (pl.: parkoló, medencebár, vasaló)
+                  * `TRAVEL_TYPE` - Utazási mód megnevezése és leírása (pl.: autóbusszal, egyénileg)
+            descriptionID:
+              oneOf:
+                - $ref: "#/components/schemas/id"
+            tagsIDs:
+              type: array
+              minItems: 0
+              items:
+                oneOf:
+                  - $ref: "#/components/schemas/id"
+
+    tags:
+      allOf:
+        - $ref: "#/components/schemas/selfRef"
+        - type: object
+          properties:
+            type:
+              type: string
+              enum: [roomName, quantityName, discountType, memo]
+              example: "roomName"
+              description: |
+                A törzsadat típusának a neve.
+                # Egyszerű törzsadat típus
+                Ezek a törzsadatok nem rendelkeznek a nevükön kívül ('name' tulajdonság) egyéb tulajdonsággal.
+                * `roomName` - Lakóegység neve. Az egyszerűség miatt NEM bontjuk további tulajdonságokra (pl.: fekvés [kerti], kilátás [tengerre néző], szint [szuperior]), hanem egyben adjuk meg.
+                * `quantityName` - Egy tétel mennyiségjelzője. (pl.: /nap; /fő; /foglalás)
+                * `discountType` - Egy akció típusa. 
+                  Jelenleg 4 akciótípus van a rendszerünkben: 
+                    - `Akciós` - nincs az akciónak kiemelt tulajdonsága
+                    - `First minute` - előfoglalási akció
+                    - `Last minute` - közeli indulású vagy korlátozott foglalhatóságú utakra adott akció
+                    - `Nincs akcióban` - "Technikai hack" a katalógus árak időponthoz kötött változtatására. (Pl.: A gyorsan fogyó helyek miatt a referens kéri, hogy 1 hónapig X%-val magasabbak legyenek az árak)  
+                * `memo` - Felárak esetében van egy "Memo" tulajdonság, ami a 0 forintos tételek esetén az ár helyett jelenik meg.  
+                  pl.: "0 ft/foglalás" helyett "Ajándék!"  
+                  Az ár számítás továbbra is 0 Ft-tal történik.
+
+    GPSPosition:
+      type: object
+      description: GPS koordinátákat reprezentáló objektum
+      properties:
+        latitude:
+          type: number
+          format: float
+          minimum: -90
+          maximum: 90
+          nullable: true
+          description: A GPS koordináta 'latitude' komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 0
+          example: 47.5059676
+        longitude:
+          type: number
+          format: float
+          minimum: -180
+          maximum: 180
+          nullable: true
+          description: A GPS koordináta 'longitude' komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 0
+          example: 19.0376893
+        zoom:
+          type: number
+          format: float
+          minimum: 1
+          maximum: 20
+          nullable: true
+          description: A GPS koordináta 'zoom' vagy magasság komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 1
+          example: 14.8
+
+    locations:
+      allOf:
+        - $ref: "#/components/schemas/selfRef"
+        - $ref: "#/components/schemas/GPSPosition"
+        - type: object
+          properties:
+            parentID:
+              type: string
+              format: uri
+              example: "/data/base/location/9412"
+              description: "A szülő törzsadat azonosítója, a fa struktúra létrehozásához. 'country' subtype esetén nem kötelező"
+            descriptionsID:
+              type: string
+              format: uri
+              example: "/data/base/descriptions/556"
+              description: A leírás törzsadat azonosítója. Csak type=description az érvényes
+            type:
+              type: string
+              enum: [city, region, country]
+              example: "region"
+              description: |
+                A törzsadat típusának a neve.
+                # Lokáció törzsadat típus
+                Olyan törzsadatok, amelyek egy helyszínt jelölnek (pl.: város, ország)
+                A törzsadat fa három szintű, így az egyéb szinteket (pl.: POI, városrész) a város alá soroltuk be.
+                A lokáció típusa:
+                  * `city` - város, városrész, látványosság
+                  * `region` - földrajzi, közigazgatási vagy történelmi régió
+                  * `country` - független állam, lásd: https://hu.wikipedia.org/wiki/Kontinensek_%C3%A9s_orsz%C3%A1gok_list%C3%A1ja
+
+    accomodations:
+      allOf:
+        - $ref: "#/components/schemas/selfRef"
+        - $ref: "#/components/schemas/GPSPosition"
+        - type: object
+          properties:
+            name:
+              type: string
+              minLength: 3
+              maxLength: 128
+              description: "A szállás neve"
+            ratingID:
+              type: string
+              format: uri
+              example: "/data/base/tag/975"
+              description: |
+                A szállás besorolásának ID-je  
+                pl.: 5*
+            descriptionsID:
+              type: string
+              format: uri
+              description: Az leírást azonosító hívás
+              example: "/data/base/descriptions/7643"
+            typeID:
+              type: string
+              format: uri
+              example: "/data/base/tag/652"
+              description: |
+                A szállás típusának ID-je  
+                pl.: Hotel
+            arrayOfServiceIDs:
+              type: array
+              description: "A szálláshoz tartozó szállás-, szoba- és sportszolgáltatások ID-i."
+              nullable: true
+              items:
+                type: string
+                format: uri
+                example: "/data/base/tag/888"
+                description: "A szolgáltatás ID-je"
+            locations:
+              type: object
+              description: |
+                A szállás helye: 
+                  * ország
+                  * város
+                  * régió
+                  * GPS koordináták
               required:
-                - username
-                - password
-      responses:
-        '200':
-          description: Sikeres belépés
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  token:
-                    type: string
-                    description: Hitelesítési token
-        '401':
-          description: "A hitelesítés nem sikerült: hibás a felhasználó vagy a jelszó"
-  /users/logout:
-    delete:
-      tags:
-        - felhasználó
-        - hitelesítés
-      summary: A hitelesítési token érvénytelenítése
-      parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-          required: true
-          description: Hitelesítési token
-      responses:
-        '200':
-          description: Sikeres kilépés
-        '401':
-          description: A felhasználónak a híváshoz nincs jogosultsága
-  /users/subscribes:
-    get:
-      tags:
-        - felhasználó
-        - "esemény vezérelt szolgáltatás"
-      summary: Lista, amely a felhasználó által feliratkozott, aktív szervereseményeket tartalmazza
-      parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-          required: true
-          description: Hitelesítési token
-      responses:
-        '200':
-          description: Lista generálás
-          content:
-            application/json:
-              schema:
-                type: array
-                item: 
-                  type: object
-                  properties:
-                    "#":
-                      type: integer
-                      format: int32
-                      example: 1
-                    "name":
-                      type: string
-                      example: "Teljes frissítés: javasolt"
-                    "callbackURI":
-                      type: string
-                      format: uri
-                      example: "https://api.kulsoszerver.hu/v1/teljes-frissites-inditasa"
-                    "subscribeDate":
-                      type: string
-                      format: date
-                      example: 2023-01-01
-        '401':
-          description: A felhasználónak a híváshoz nincs jogosultsága
-
-  /utils:
-    get:
-      tags:
-      - eszközök
-      - "esemény vezérelt szolgáltatás"
-      summary: Lista
-      description: |-
-        A szerveren, bejelentkezett felhasználók számára elérhető eszközök listája az adatok egyszerűbb átadására.
-      parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-          required: true
-          description: Hitelesítési token
-      responses:
-        '200':
-          description: Sikeres lista generálás
-          content:
-            application/json:
-              schema:
-                type: array
-                item: 
-                  type: object
-                  properties:
-                    "#":
-                      type: integer
-                      format: int32
-                    "requestPath":
-                      type: string
-                    "requestParameters":
-                      type: string
-                    "description":
-                      type: string
-        '401':
-          description: A felhasználónak a híváshoz nincs jogosultsága
-
-  /utils/status:
-    get:
-      tags:
-      - eszközök
-      - "esemény vezérelt szolgáltatás"
-      summary: A szerver aktuális statisztikái
-      description: |-
-        A szerver utolsó 1 órájának az átlag mutatói:  
-        - válaszidő
-        - terheltség %-ban
-        - javasolt teljes adatlekérés?
-        - javasolt objektumok lekérése?
-      parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-          required: true
-          description: Hitelesítési token
-      responses:
-        '200':
-          description: Sikeres generálás
-          content:
-            application/json:
-              schema:
-                type: array
-                item: 
-                  minItems: 4
-                  maxItems: 4
-                  type: object
-                  properties:
-                    "#":
-                      type: integer
-                      format: int32
-                      example: 1
-                    "measurement":
-                      type: string
-                      example: "Is full update recommended?"
-                    "quantity":
-                      oneOf:
-                      - type: number
-                        format: float
-                        example: 284.65
-                      - type: string
-                        description: Szabadszavas szöveg
-                        example: "Ft/kWh"
-                      - type: string
-                        enum: ["recommended", "not recommended"]
-                        description: A szerver terheltségétől függő információk eredménye
-                        example: "recommended"
-                    "unit":
-                      type: string
-                      example: "-"
-        '401':
-          description: A felhasználónak a híváshoz nincs jogosultsága
-
-  /utils/status/requests/:
-    get:
-      tags:
-      - eszközök
-      summary: Segédútvonal a REST API szabványos struktúrájához.
-      responses:
-        '204':
-          description: Nincs tartalom
-
-  /utils/status/requests/{requestID}:
-    get:
-      tags:
-      - eszközök
-      - "esemény vezérelt szolgáltatás"
-      summary: A szervernek küldött kérés státusza
-      description: |-
-        A felhasználó ellenőrizheti az egyes kéréseinek a státuszát, amennyiben az túl hosszú ideig elhúzódik.  
-        **Az egyes státuszok:**  
-          - **unknown**: a kérés az adott azonosítóval nem létezik vagy idő közben befejeződött
-          - **in queue**: a kérés sorban áll a futtatáshoz
-          - **in progress**: a kérést az adatbázis szerver épp feldolgozza
-          - **response in progress**: a válasz átadása folyamatban van
-      parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-          required: true
-          description: Hitelesítési token
-        - in: path
-          name: requestID
-          schema:
-            type: string
-            format: urid
-            example: AAAA-BBBB-CCCC-DDDD-EEEE
-          required: true
-          description: Kérés azonosító
-      responses:
-        '200':
-          description: Sikeres státusz lekérés
-          content:
-            application/json:
-              schema:
-                type: string
-                enum: ["unknown","in queue","in progress","response in progress"]
-                description: |-
-                  Az egyes státuszok:  
-                    - "unknown": a kérés az adott azonosítóval nem létezik vagy idő közben befejeződött
-                    - "in queue": a kérés sorban áll a futtatáshoz
-                    - "in progress": a kérést az adatbázis szerver épp feldolgozza
-                    - "response in progress": a válasz átadása folyamatban van
-                example: "in queue"
-                  
-        '401':
-          description: A felhasználónak a híváshoz nincs jogosultsága
-          
-  /utils/subscribes:
-    get:
-      tags:
-      - eszközök
-      - "esemény vezérelt szolgáltatás"
-      - "esemény kezelés"
-      summary: A szervereseményeket kezelő hívások
-      description: |-
-        A felhasználó feliratkozhat bizonyos szerver eseményekre. Az események megtörténtekor a Budavár Tours API szerver meghívja a felhasználó által megadott URI-t.
-      parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-          required: true
-          description: Hitelesítési token
-        - in: query
-          name: offset
-          schema:
-            type: integer
-          description: A lista oldalszámát megadó paraméter 
-        - in: query
-          name: limit
-          schema:
-            type: integer
-          description: A lista oldalain lévő elemek számát megadó paraméter. Max. 30
-      responses:
-        '200':
-          description: A felhasználó számára elérhető szerveresemények listája
-          headers:
-            x-next:
-              description: A lista következő N elemét tartlamazó hivatkozás
-              schema:
-                type: string
-                example: "https://api.budavartours.hu/api/v1/utils/subscribe?offset=1&limit=30"
-          content:
-            application/json:
-              schema:
-                type: array
-                minItems: 0
-                maxItems: 50
-                default: 30
-                items:
-                  type: object
-                  properties: 
-                    "eventID":
-                      type: integer
-                      format: int64
-                      example: 111275843
-                    "eventName":
-                      type: string
-                      enum: ["onFullUpdateRecommended","onParitalUpdateRecommended"]
-                      example: "onFullUpdateRecommended"
-                    "description":
-                      type: string
-                      example: "If server load drops below 20%"
-                    "isAlreadySubscribed":
-                      type: boolean
-                    "callbackURI":
-                      oneOf:
-                        - type: string
-                          format: uri
-                          example: "https://api.example.com/v1/BUDAVARTOURS/startFullUpdate"
-                        - type: string
-                          enum: ["null"]
-                    "subscribeDate":
-                      type: string
-                      format: date
-        '401':
-          description: A felhasználónak a híváshoz nincs jogosultsága
-
-  /utils/subscribes/{eventID}:
-    post:
-      tags:
-      - eszközök
-      - "esemény vezérelt szolgáltatás"
-      - "szerveresemény kezelés"
-      summary: A szervereseményre feliratkozás
-      description: |-
-        A felhasználó feliratkozhat bizonyos szerver eseményekre. Az események megtörténtekor a Budavár Tours API szerver meghívja a felhasználó által megadott URI-t.
-      parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-          required: true
-          description: Hitelesítési token
-        - in: path
-          name: eventID
-          schema:
-            type: integer
-            format: int64
-          required: true
-          description: A szerveresemény egyedi azonosítója
-      requestBody:
-        description: Optional description in *Markdown*
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
+                - cityID
+                - countryID
               properties:
-                callbackURI:
+                cityID:
                   type: string
                   format: uri
-      responses:
-        '201':
-          description: A felhasználó feliratkozása sikeresen megtörtént
-          content:
-            application/json:
-              schema:
+                  example: "/data/locatios/city/868"
+                  description: A város ID-je, ahol a szállás található.
+                countryID:
+                  type: string
+                  format: uri
+                  example: "/data/locatios/counrty/869"
+                  description: Az ország ID-je, ahol a szállás található.
+                regionID:
+                  type: string
+                  format: uri
+                  example: "/data/locatios/region/668"
+                  description: A régió ID-je, ahol a szállás található. Elhagyható.
+            arrayOfDescriptionIDs:
+              type: array
+              minItems: 1
+              description: A szállás leírásait tartlamazó törzsadatok ID-i
+              items:
+                type: string
+                format: uri
+                example: "/data/base/descriptions/556"
+                description: A leírás törzsadat azonosítója. Csak type=description az érvényes
+
+    departuresHead:
+      allOf:
+        - $ref: "#/components/schemas/selfRef"
+        - type: object
+          properties:
+            departureID:
+              type: string
+              format: uri
+              example: "/data/prices/descriptions/556"
+              description: Az indulás és úthossz azonosítója
+            tripStart:
+              type: string
+              format: date
+              description: "Az indulás ISO 8601 formátumú időbélyegzője"
+              example: "2023-07-10"
+              externalDocs:
+                description: "Internet Date/Time Format syntax description"
+                url: https://www.rfc-editor.org/rfc/rfc3339#section-5.6
+            tripEnd:
+              type: string
+              format: date
+              description: "A hazaérkezés ISO 8601 formátumú időbélyegzője"
+              example: "2023-07-17"
+              externalDocs:
+                description: "Internet Date/Time Format syntax description"
+                url: https://www.rfc-editor.org/rfc/rfc3339#section-5.6
+            days:
+              type: integer
+              format: int32
+              minimum: 0
+              example: 8
+              description: A program napjainak száma
+            nights:
+              type: integer
+              format: int32
+              minimum: 0
+              example: 7
+              description: A program éjszakáinak száma.
+
+    progamScheme:
+      allOf:
+        - $ref: "#/components/schemas/selfRef"
+        - type: object
+          properties:
+            arrayOfDepartures:
+              type: array
+              description: A program indulási dátumai, úthosszai és a hozzájuk tartozó legjobb árak adatai
+              items:
                 type: object
-                properties:
-                  name:
-                    type: string
-                  eventID:
-                    type: integer
-                    format: int64
-                  callbackURI:
+                allOf:
+                  - $ref: "#/components/schemas/departuresHead"
+                  - type: object
+                    required:
+                      - fullPrice
+                    properties:
+                      fullPrice:
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        example: 349990
+                        description: Az adott indulási nap és úthossz esetén a *kötelező elemeket tartalmazó* legolcsóbb foglalható szoba, teljes, fejenkénti ára
+                      discountPrice:
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        example: 319990
+                        description: Az adott indulási nap és úthossz esetén a *kötelező elemeket tartalmazó* legolcsóbb foglalható szoba, kedvezményes, fejenkénti ára
+                      discountID:
+                        type: string
+                        format: uri
+                        example: "/data/base/tags/556"
+                        description: Az induláshoz és úthosszhoz tartozó legjobb ár akció típusának ID-je
+                      discountPriceValidUntil:
+                        type: string
+                        format: date
+                        description: "A 'discountPrice' ár érvényessége végének az ISO 8601 formátumú időbélyegzője"
+                        example: "2023-07-10"
+                        externalDocs:
+                          description: "Internet Date/Time Format syntax description"
+                          url: https://www.rfc-editor.org/rfc/rfc3339#section-5.6
+            locations:
+              type: object
+              description: A program által érintett helyszínek listája
+              required:
+                - departure
+                - arrival
+              properties:
+                departure:
+                  description: A program indulásának helyszíne
+                  type: object
+                  required:
+                    - cityID
+                    - countryID
+                  properties:
+                    cityID:
+                      type: string
+                      format: uri
+                      example: "/data/locations/cities/556"
+                      description: A program indulási városa
+                    countryID:
+                      type: string
+                      format: uri
+                      example: "/data/locations/countries/556"
+                      description: A program indulásái városának országa
+                    regionID:
+                      type: string
+                      format: uri
+                      example: "/data/locations/regiones/556"
+                      description: A program indulásái városának régiója. Elhagyható tulajdonság
+                arrival:
+                  type: object
+                  description: A program desztinációjának első helyszínei
+                  required:
+                    - cityID
+                    - countryID
+                  properties:
+                    cityID:
+                      type: string
+                      format: uri
+                      example: "/data/locations/cities/556"
+                      description: A program desztinációjának első városa
+                    countryID:
+                      type: string
+                      format: uri
+                      example: "/data/locations/countries/556"
+                      description: A program desztinációjának első városának országa
+                    regionID:
+                      type: string
+                      format: uri
+                      example: "/data/locations/regiones/556"
+                      description: A program desztinációjának első városának régiója
+                arrayOfOtherLocationsID:
+                  type: array
+                  oneOf:
+                    - minItems: 1
+                  items:
                     type: string
                     format: uri
-        '401':
-          description: A felhasználónak a híváshoz nincs jogosultsága
-    put:
-      tags:
-      - eszközök
-      - "esemény vezérelt szolgáltatás"
-      - "szerveresemény kezelés"
-      summary: A szerveresemény feliratkozás frissítése
-      description: |-
-        A felhasználó feliratkozhat bizonyos szerver eseményekre. Az események megtörténtekor a Budavár Tours API szerver meghívja a felhasználó által megadott URI-t.
-      parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-          required: true
-          description: Hitelesítési token
-        - in: path
-          name: eventID
-          schema:
-            type: integer
-            format: int64
-          required: true
-          description: A szerveresemény egyedi azonosítója
-      requestBody:
-        description: Optional description in *Markdown*
-        required: true
-        content:
-          application/json:
-            schema:
+                    example: "/data/locations/cities/556"
+                    description: "A program által érintett város ID-jeinek listája"
+            arrayOfChildMaxAges:
+              type: array
+              minItems: 1
+              description: |
+                Az egyes gyerekek maximum életkora. A tömb a maximum gyerekkapacitással rendelkező szoba maximum életkorait tartalmazza.  
+                **pl.: `[12,6]` jelentése:**
+                * 1. gyerek max. 12 éves korig kaphat gyerekárat
+                * 2. gyerek max. 6 éves korig kaphet gyerekárat
+                Ezek az életkor limitek szállásonként globálisan vannak beállítva, nem függenek a szoba típúsától, de a szoba típúsa meghatározza a kapacitást.  
+                ##### Tájékoztató jellegű információ, a pontos kapacitás az árak táblázatban, a /programs/{id*}/prices hívással érhető el
+              example: "[12,6]"
+              items:
+                type: integer
+                format: int32
+                minimum: 2
+                maximum: 19
+            gallery:
               type: object
+              description: "A programsémához tartozó kép- és videogaléria"
+              required:
+                - arrayOfImages
               properties:
-                callbackURI:
+                video:
                   type: string
                   format: uri
-      responses:
-        '201':
-          description: A felhasználó feliratkozásának frissítése sikeresen megtörtént
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                  eventID:
-                    type: integer
-                    format: int64
-                  callbackURI:
+                  description: "A programsémához tartozó video URI címe, amely egy videomegosztó (youtube, vimeo, stb) 'embedd' URL-jét tartalmazza. A tulajdonság elhagyható."
+                  example: "https://www.youtube.com/embed/yMJu-Vvl71M?enablejsapi=1"
+                arrayOfImages:
+                  type: array
+                  minItems: 1
+                  description: "A programhoz tartozó képek elérhetőségének és azok leírásainak a listája. A képek a www.budavartours.hu weboldalon található sorrendben vannak a tömbben"
+                  items:
+                    type: object
+                    required:
+                      - uri
+                    properties:
+                      uri:
+                        type: string
+                        format: uri
+                        description: "A kép URI elérhetősége a cdn.budavartours.hu szerveren"
+                        pattern: 'https\:\/\/cdn\.budavartours\.hu\/.*?$'
+                        example: "https://cdn.budavartours.hu/binaries/content/gallery/budavar/programs/programscheme/szlovakia/pozsony/koronazasi-unnepseg-pozsonyban/1280px-eisenstadt_-_schloss_esterhazy.jpg"
+                      descriptionID:
+                        type: string
+                        format: uri
+                        example: "/data/prices/descriptions/556"
+                        description: A képhez tartozó magyarázó szövege. (Nem egyenlő a kép HTML title attributumával)
+            arrayOfDescriptionIDs:
+              type: array
+              minItems: 2
+              description: |
+                A programsémához tartozó leírások. Ezek az adminiszttrációs rendszerben felvett Programsémához tartozó összes leírás és az Alapprogramhoz tartozó összes leírás.  
+                A leírás ID sorrendje megegyezik a www.budavartours.hu oldalon található szövegek megjelenési sorrendjével.  
+                Legalább kettő ID-t kell tartalmaznia a tömbnek, amelyek:
+                  * index 0: programséma leírás
+                  * index 1: alapprogram leírás
+              items:
+                type: string
+                format: uri
+                example: "/data/base/descriptions/556"
+            properties:
+              type: object
+              required:
+                - arrayOfcateringIDs
+                - programTypeID
+                - arrayOfTravelModeIDs
+                - arrayOfAccomodations
+              properties:
+                arrayOfCateringsID:
+                  type: array
+                  minItems: 1
+                  description: A programsémához tartozó összes (szezonális is) ellátás ID-je.
+                  items:
                     type: string
                     format: uri
-        '401':
-          description: A felhasználónak a híváshoz nincs jogosultsága
-    delete:
-      tags:
-      - eszközök
-      - "esemény vezérelt szolgáltatás"
-      - "szerveresemény kezelés"
-      summary: A szerveresemény feliratkozás frissítése
-      description: |-
-        A felhasználó feliratkozhat bizonyos szerver eseményekre. Az események megtörténtekor a Budavár Tours API szerver meghívja a felhasználó által megadott URI-t.
-      parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-          required: true
-          description: Hitelesítési token
-        - in: path
-          name: eventID
-          schema:
-            type: integer
-            format: int64
-          required: true
-          description: A szerveresemény egyedi azonosítója
-      requestBody:
-        description: Optional description in *Markdown*
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                callbackURI:
+                    example: "/data/base/basicData/556"
+                programTypeID:
                   type: string
                   format: uri
-      responses:
-        '204':
-          description: A felhasználó feliratkozásának törlése sikeresen megtörtént
-        '401':
-          description: A felhasználónak a híváshoz nincs jogosultsága
-
-  /utils/priorityTimeWindows/{timeWindowID}:
-    get:
-      tags:
-      - eszközök
-      - "esemény vezérelt szolgáltatás"
-      - "magas prioritású szerver rendelkezésre állás"
-      summary: A szerver szabad beosztásásának lekérdezése
-      description: |-
-        A felhasználónak lehetősége van *magas prioritású időablakot* igényelni. A megadott időablakban a felhasználó által küldött kérések magas prioritásban hajtódnak végre.  
-        A hívás a 'magas prioritású időpontok' rejndjét adja vissza.
-      parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-          required: true
-          description: Hitelesítési token
-      responses:
-        '200':
-          description: A 'magas prioritású időpontok' rendje
-          content:
-            application/json:
-              schema:
-                type: array
-                minitems: 1
-                items:
-                  type: object
-                  properties:
-                    startTime:
-                      type: string
-                      format: date-time
-                      description: Az időablak kezdete
-                    startEnd:
-                      type: string
-                      format: date-time
-                      description: Az időablak vége, alapértelmezetten 10 perc időtartamú az ablak
-                    isReserved:
-                      type: boolean
-                      description: |-
-                        Az időablak foglalható vagy sem?  
-                        true = foglalható
-                        false = nem foglalható
-                    timeWindowID:
-                      type: integer
-                      format: int64
-        '401':
-          description: A felhasználónak a híváshoz nincs jogosultsága
-    post:
-      tags:
-      - eszközök
-      - "esemény vezérelt szolgáltatás"
-      - "magas prioritású szerver rendelkezésre állás"
-      summary: Egy 'magas prioritású időpont' lefoglalása a felhasználó számára
-      description: |-
-        A felhasználónak lehetősége van 'magas prioritású időablakot' igényelni. A megadott időablakban a felhasználó által küldött kérések magas prioritásban hajtódnak végre.  
-        A hívás segítségével egy időablakot lehet lefoglalni.
-      parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-          required: true
-          description: Hitelesítési token
-        - in: path
-          name: timeWindowID
-          schema:
-            type: integer
-            format: int64
-          required: true
-          description: Az időablak egyedi azonosítója
-      responses:
-        '200': 
-          description: Az időablak már lefoglalásra került (az aktuális felhasználó által).
-        '201':
-          description: Az időablak foglalása sikeresen megtörtént
-          content:
-            application/json:
-              schema:
-                startTime:
-                  type: string
-                  format: date-time
-                  description: Az időablak kezdete
-                startEnd:
-                  type: string
-                  format: date-time
-                  description: Az időablak vége, alapértelmezetten 10 perc időtartamú az ablak
-                isReserved:
-                  type: boolean
-                  description: |-
-                    Az időablak foglalható vagy sem?  
-                    true = foglalható
-                    false = nem foglalható
-                timeWindowID:
-                  type: integer
-                  format: int64
-        '401':
-          description: A felhasználónak a híváshoz nincs jogosultsága
-        '409':
-          description: Az időablak már foglalt (egy másik felhasználó által).
-    delete:
-      tags:
-      - eszközök
-      - "esemény vezérelt szolgáltatás"
-      - "magas prioritású szerver rendelkezésre állás"
-      summary: Egy, már lefoglalt 'magas prioritású időpont' felszabadítása a foglaltság alól
-      description: |-
-        A felhasználónak lehetősége van 'magas prioritású időablakot' igényelni. A megadott időablakban a felhasználó által küldött kérések magas prioritásban hajtódnak végre.  
-        A hívás segítségével egy, korábban lefoglalt időablakot lehet szabaddá tenni. A szabaddá tételét az időablak kezdetéig lehet megtenni, kizárólag a foglalást intéző felhasználó által.
-      parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-          required: true
-          description: Hitelesítési token
-        - in: path
-          name: timeWindowID
-          schema:
-            type: integer
-            format: int64
-          required: true
-          description: Az időablak egyedi azonosítója
-      responses:
-        '200': 
-          description: Az időablak már felszabadításra került (az aktuális felhasználó által).
-        '201':
-          description: Az időablak felszabadítása sikeresen megtörtént
-          content:
-            application/json:
-              schema:
-                startTime:
-                  type: string
-                  format: date-time
-                  description: Az időablak kezdete
-                startEnd:
-                  type: string
-                  format: date-time
-                  description: Az időablak vége, alapértelmezetten 10 perc időtartamú az ablak
-                isReserved:
-                  type: boolean
-                  description: |-
-                    Az időablak foglalható vagy sem?  
-                    true = foglalható
-                    false = nem foglalható
-                timeWindowID:
-                  type: integer
-                  format: int64
-        '401':
-          description: A felhasználónak a híváshoz nincs jogosultsága
-        '409':
-          description: Az időablak már foglalt (egy másik felhasználó által).
-
-  /baseData:
-    get:
-      tags:
-      - törzsadatok
-      - alapadatok
-      summary: A különböző típusú törzsadatok teljes listája
-      description: |-
-        Az utak teljes felépítéséhez az alapadatok adják a gerincet. Az alapadatok a törzsadatokból (*/data/base* hívás alatti hívások) és a lokációkból (*/data/base/locations* hívás alatti hívások) áll.  
-        **A hívás a teljes törzsadat listát adja vissza.**  
-        Ezt a listát érdemes ritkán frissíteni, mivel a */data/base/descriptions* (az egyes elemek leírását tartalmazó hívás) elemei is szerepelnek benne és tartalmuk nagy méretű is lehet. A lista összes elemének letöltése előtt javasolt a */utils/priorityTimeWindows/* hívás segítségével egy 'magas prioritású időablakot' igényelni, így sokkal kisebb az esélye egy *504 Gateway Timeout* válasznak.  
-
-        Rendszeres frissítés esetén érdemes a */data/history* hívást használni, ami megadja az utóbbi maximum 48 órában megváltozott objektumok listáját.  
-
-        Alternatívaként használható a */utils/subscribe* hívás, amely segítségével feliratkozhatunk az *objectUpdated* eseményre. Ez az esemény egy megadott objektum módosulása (frissítés vagy törlés) esetén meghív egy külső URI-t, így a partner szervere valós időben értesül az eseményről.
-      parameters:
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-          required: true
-          description: Hitelesítési token
-      responses:
-        '200':
-          description: A törzsadatok listája
-          content:
-            application/json:
-              schema:
-                type: array
-                minitems: 1
-                uniqueItems: true
-                items:
-                  type: object
-                  properties:
-                    self:
-                      type: string
-                      format: uri
-                      example: "#/data/options/stornoPrice"
-                    type:
-                      type: string
-                      enum: ["options", "descriptions", "basicData", "tags"]
-                    name: 
-                      type: string
-                      minLength: 3
-                      maxlength: 128
-                      example: "Sztornó"
-                    descriptionID:
-                      type: string
-                      format: uri
-                      example: "#/data/description/stornoPrice"
-                    value:
-                      oneOf:
-                        - type: string
-                        - type: number
-                    additionalProperties: {}
-        '401':
-          description: A felhasználónak a híváshoz nincs jogosultsága
-
-
-  /baseData/options/{baseID*}:
-  /baseData/descriptions/{baseID*}:
-  /baseData/basicDatas/{baseID*}:
-  /baseData/tags/{baseID*}:
-  /locations/cities/{locationID*}:
-  /locations/regions/{locationID*}:
-  /locations/countries/{locationID*}:
-  /locations/accomodations/{locationID*}:
-  
-  /programs/{programID*}:
-  /prices/{programID*}:
-  /prices/departures/{departureID*}:
-  
-  /quicklists/locations:
-  /quicklists/accomodations:
-  /quicklists/programs:
-  /quicklists/histories:
-
-  /history/{objectPATH*}:
-
-
-
-#   /masterdatas:
-#     get:
-#       tags:
-#         - "törzsadat"
-#       summary: "Az ÖSSZES törzsadatot visszaadó kérés"
-#       description: |
-#         A válasz az összes - lentebb - felsorolt, bármely program által használat törzsadatot tartalmazza:
-
-#         Alapadatok:
-#           * a jelenlegi törzsadatok
-#           * szobanevek
-#           * mennyiségi egységek
-#           * lokációk (csak amelyeket használunk)
-#           * akciók típusai
-
-#         Hosszú leírások:
-#           * a szállások leírásai
-#           * a fakultatív programok leírásai
-#           * az alapprogramok leírásai
-#           * a programsémák leírásai
-#           * a lokációk leírásai
-#           * az akciók leírása
-
-#         **FONTOS! A hosszú leírások miatt a válasz mérete extrém nagy lehet mind méretben, mind válaszidőben!**
-#       operationId: bvt.publicAPI.v1.getAllBasicData
-#       responses:
-#         '200':
-#           description: Sikeres lekérés
-#           content:
-#             application/json:
-#               schema:
-#                 $ref: '#/components/schemas/ArrayOfMasterDatas'
-#         '413':
-#           description: A válasz mérete túl nagy
-#         '429':
-#           description: Túl sok kérés érkezett a felhasználótól (rate-limit)
-#         '500':
-#           description: Belső hiba a feldolgozás során
-#         '503':
-#           description: A szerver jelenleg nem elérhető
-#         '504':
-#           description: A szerver túlterhelt
-#         '507':
-#           description: A szerver tárterülete elfogyott
-#       security:
-#         - BVT_auth:
-#             - read:basicdata
-
-#   /masterdatas/{id*}:
-#     get:
-#       tags:
-#         - "törzsadat"
-#       summary: "Az {id} paraméreben meghatározott törzsadatokat adja vissza."
-#       description: |
-#         Az {id} paraméreben meghatározott - egy vagy több - törzsadat adatait adja vissza tömb formában.
-        
-#         **FONTOS! A hosszú leírások miatt a válasz mérete extrém nagy lehet mind méretben, mind válaszidőben!**
-#       operationId: bvt.publicAPI.v1.getSomeBasicData
-#       responses:
-#         '200':
-#           description: Sikeres lekérés
-#           content:
-#             application/json:
-#               schema:
-#                 $ref: '#/components/schemas/ArrayOfMasterDatas'
-#         '413':
-#           description: A válasz mérete túl nagy
-#         '429':
-#           description: Túl sok kérés érkezett a felhasználótól (rate-limit)
-#         '500':
-#           description: Belső hiba a feldolgozás során
-#         '503':
-#           description: A szerver jelenleg nem elérhető
-#         '504':
-#           description: A szerver túlterhelt
-#         '507':
-#           description: A szerver tárterülete elfogyott
-#       security:
-#         - BVT_auth:
-#             - read:basicdata
-  
-#   /programs:
-#     get:
-#       tags:
-#         - "utazási program"
-#       summary: "Az összes program listája"
-#       description: Leírás
-#       operationId: bvt.publicAPI.v1.getAllPrograms
-#       responses:
-#         '200':
-#           description: Sikeres lekérés
-#           content:
-#             application/json:
-#               schema:
-#                 $ref: '#/components/schemas/ProgamScheme'
-#         '413':
-#           description: A válasz mérete túl nagy
-#         '429':
-#           description: Túl sok kérés érkezett a felhasználótól (rate-limit)
-#         '500':
-#           description: Belső hiba a feldolgozás során
-#         '503':
-#           description: A szerver jelenleg nem elérhető
-#         '504':
-#           description: A szerver túlterhelt
-#         '507':
-#           description: A szerver tárterülete elfogyott
-#       security:
-#         - BVT_auth:
-#             - read:programs
-
-#   /programs/location/{locationID}:
-#     get:
-#       tags:
-#         - "utazási program"
-#       summary: "Az összes program listája egy adott lokáció ID alatt "
-#       description: Leírás
-#       operationId: bvt.publicAPI.v1.getAllProgramsByLocation
-#       responses:
-#         '200':
-#           description: Sikeres lekérés
-#           content:
-#             application/json:
-#               schema:
-#                 $ref: '#/components/schemas/ProgamScheme'
-#         '413':
-#           description: A válasz mérete túl nagy
-#         '429':
-#           description: Túl sok kérés érkezett a felhasználótól (rate-limit)
-#         '500':
-#           description: Belső hiba a feldolgozás során
-#         '503':
-#           description: A szerver jelenleg nem elérhető
-#         '504':
-#           description: A szerver túlterhelt
-#         '507':
-#           description: A szerver tárterülete elfogyott
-#       security:
-#         - BVT_auth:
-#             - read:programs
-
-#   /programs/date/{dateFrom}/{dateTo}:
-#     get:
-#       tags:
-#         - "utazási program"
-#         - "hiányos"
-#       summary: "Az összes program listája két adott időpont között"
-#       description: Leírás
-#       operationId: bvt.publicAPI.v1.getAllProgramsByDates
-#       responses:
-#         '200':
-#           description: Sikeres lekérés
-#           content:
-#             application/json:
-#               schema:
-#                 $ref: '#/components/schemas/ProgamScheme'
-#         '413':
-#           description: A válasz mérete túl nagy
-#         '429':
-#           description: Túl sok kérés érkezett a felhasználótól (rate-limit)
-#         '500':
-#           description: Belső hiba a feldolgozás során
-#         '503':
-#           description: A szerver jelenleg nem elérhető
-#         '504':
-#           description: A szerver túlterhelt
-#         '507':
-#           description: A szerver tárterülete elfogyott
-#       security:
-#         - BVT_auth:
-#             - read:programs
-
-#   /programs/{programID*}:
-#     get:
-#       tags:
-#         - "utazási program"
-#       summary: "Adott program vagy programok sémája"
-#       description: Leírás
-#       operationId: bvt.publicAPI.v1.getSomePrograms
-#       responses:
-#         '200':
-#           description: Sikeres lekérés
-#           content:
-#             application/json:
-#               schema:
-#                 $ref: '#/components/schemas/ProgamScheme'
-#         '413':
-#           description: A válasz mérete túl nagy
-#         '429':
-#           description: Túl sok kérés érkezett a felhasználótól (rate-limit)
-#         '500':
-#           description: Belső hiba a feldolgozás során
-#         '503':
-#           description: A szerver jelenleg nem elérhető
-#         '504':
-#           description: A szerver túlterhelt
-#         '507':
-#           description: A szerver tárterülete elfogyott
-#       security:
-#         - BVT_auth:
-#             - read:programs
-
-#   /program/{programID*}/prices:
-#     get:
-#       tags:
-#         - "árak"
-#       summary: "Egy adott programhoz tartozó összes indulás összes ára"
-#       description: Leírás
-#       operationId: bvt.publicAPI.v1.getProgramPricesWithID
-#       responses:
-#         '200':
-#           description: Sikeres lekérés
-#           content:
-#             application/json:
-#               schema:
-#                 $ref: '#/components/schemas/ProgramsPrices'
-#         '413':
-#           description: A válasz mérete túl nagy
-#         '429':
-#           description: Túl sok kérés érkezett a felhasználótól (rate-limit)
-#         '500':
-#           description: Belső hiba a feldolgozás során
-#         '503':
-#           description: A szerver jelenleg nem elérhető
-#         '504':
-#           description: A szerver túlterhelt
-#         '507':
-#           description: A szerver tárterülete elfogyott
-#       security:
-#         - BVT_auth:
-#             - read:programs
-
-#   /history:
-#     get:
-#       tags:
-#         - "történet"
-#         - "hiányos"
-#       summary: ""
-#       description: Leírás
-#       operationId: bvt.publicAPI.v1.getProgramAllPrices
-#       responses:
-#         '200':
-#           description: Sikeres lekérés
-#           content:
-#             application/json:
-#               schema:
-#                 $ref: '#/components/schemas/ProgramPrices'
-#         '413':
-#           description: A válasz mérete túl nagy
-#         '429':
-#           description: Túl sok kérés érkezett a felhasználótól (rate-limit)
-#         '500':
-#           description: Belső hiba a feldolgozás során
-#         '503':
-#           description: A szerver jelenleg nem elérhető
-#         '504':
-#           description: A szerver túlterhelt
-#         '507':
-#           description: A szerver tárterülete elfogyott
-#       security:
-#         - BVT_auth:
-#             - read:programs
-
-# components:
-#   schemas:
-#     _server-message:
-#       type: object
-#       properties:
-#         code:
-#           type: integer
-#           description: Szerver üzenethez tartozó hibakód
-#         text:
-#           type: string
-#           description: A szerver hibakódhoz tartozó részletes leírás
-
-#     _gps-position-data:
-#       type: object
-#       required:
-#         - latitude
-#         - longitude
-#         - zoom
-#       properties:
-#         latitude:
-#           type: number
-#           format: float
-#           minimum: -90
-#           maximum: 90
-#           nullable: true
-#           description: A GPS koordináta 'latitude' komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 0
-#           example: 47.5059676
-#         longitude:
-#           type: number
-#           format: float
-#           minimum: -180
-#           maximum: 180
-#           nullable: true
-#           description: A GPS koordináta 'longitude' komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 0
-#           example: 19.0376893
-#         zoom:
-#           type: number
-#           format: float
-#           minimum: 1
-#           maximum: 20
-#           nullable: true
-#           description: A GPS koordináta 'zoom' vagy magasság komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 1
-#           example: 14.8
-
-#     _base-data:
-#       type: object
-#       required:
-#         - id
-#         - name
-#         - version
-#         - lastupdate
-#       properties:
-#         id:
-#           type: integer
-#           format: int32
-#           minimum: 0
-#           maximum: 65535
-#           description: "Az objektum egyedi azonosítja, ami alapján hivatkozhatunk rá"
-#           example: 217
-#         version:
-#           type: integer
-#           format: int32
-#           minimum: 1
-#           maximum: 65535
-#           description: "Az objektumon végrehajtott változtatások számát jelöli. A 'lastupdate' tulajdonság értékével biztonságosan megállapítható, hogy a kliens a legfrissebb változattal dolgozik vagy sem"
-#           example: 12
-#         lastupdate:
-#           type: string
-#           format: date-time
-#           description: "Az objektum utolsó módosításának ISO 8601 időbélyegzője"
-#           example: "2017-07-21"
-#           externalDocs:
-#             description: "Internet Date/Time Format syntax description"
-#             url: https://www.rfc-editor.org/rfc/rfc3339#section-5.6
-#         name:
-#           type: string
-#           minLength: 3
-#           maxLength: 128
-#           description: "Az objektum megjeleníthető elnevezése"
-#           example: "Kétágyas, oldalt tengerre néző 'swim up' szoba; Narcissos Waterpark Resort budapesti indulás; reggeli; Túra a Zöld-tavi menedékházhoz, Szlovákia"
-
-#     _description-data:
-#         allOf:
-#         - $ref: '#/components/schemas/_base-data'
-#         - type: object
-#           required:
-#             - content
-#             - type
-#           properties:
-#             content:
-#               type: string
-#               maxLength: 8192
-#               description: "Egy objektumhoz tartozó, kiegészítő információkat tartalmazó, HTML előformázott szöveg"
-#             type:
-#               type: string
-#               enum: [description]
-#               description: |
-#                 A törzsadat típusának a neve.  
-#                 **Leírás törzsadat típus**  
-#                 A 'description' típusú törzsadathoz tartoznia KELL egy 'content' tulajdonság, ami magát a leírást tartalmazza, HMTL előformázott szövegként
-#               example: "description"
-
-#     _option:
-#        allOf:
-#         - $ref: '#/components/schemas/_base-data'
-#         - type: object
-#           required:
-#             - content
-#             - type
-#           properties:
-#             content:
-#               type: number
-#               format: float
-#               description: |
-#                 Globális beállítás  
-#                 pl.: Sztornó százalék, HUF-EUR kurzus váltó, stb.
-#             type:
-#               type: string
-#               enum: [option]
-#               description: |
-#                 A törzsadat típusának a neve.  
-#                 **Globális beállítás**  
-#                  pl.: Sztornó százalék, HUF-EUR kurzus váltó, stb.
-#               example: 0.025
-
-
-#     _simple-data:
-#       allOf:
-#         - $ref: '#/components/schemas/_base-data'
-#         - type: object
-#           required:
-#             - type
-#           properties:
-#             type:
-#               type: string
-#               enum: [roomName, quantityName, discountType, memo]
-#               example: "roomName"
-#               description: | 
-#                 A törzsadat típusának a neve.
-#                 # Egyszerű törzsadat típus
-#                 Ezek a törzsadatok nem rendelkeznek a nevükön kívül ('name' tulajdonság) egyéb tulajdonsággal.
-#                 * `roomName` - Lakóegység neve. Az egyszerűség miatt NEM bontjuk további tulajdonságokra (pl.: fekvés [kerti], kilátás [tengerre néző], szint [szuperior]), hanem egyben adjuk meg.
-#                 * `quantityName` - Egy tétel mennyiségjelzője. (pl.: /nap; /fő; /foglalás)
-#                 * `discountType` - Egy akció típusa. 
-#                   Jelenleg 4 akciótípus van a rendszerünkben: 
-#                     - `Akciós` - nincs az akciónak kiemelt tulajdonsága
-#                     - `First minute` - előfoglalási akció
-#                     - `Last minute` - közeli indulású vagy korlátozott foglalhatóságú utakra adott akció
-#                     - `Nincs akcióban` - "Technikai hack" a katalógus árak időponthoz kötött változtatására. (Pl.: A gyorsan fogyó helyek miatt a referens kéri, hogy 1 hónapig X%-val magasabbak legyenek az árak)  
-#                 * `memo` - Felárak esetében van egy "Memo" tulajdonság, ami a 0 forintos tételek esetén az ár helyett jelenik meg.  
-#                   pl.: "0 ft/foglalás" helyett "Ajándék!"  
-#                   Az ár számítás továbbra is 0 Ft-tal történik.
-
-#     _basic-data:
-#       allOf:
-#         - $ref: '#/components/schemas/_base-data'
-#         - type: object
-#           required:
-#             - type
-#             - descriptionID
-#           properties:
-#             type:
-#               type: string
-#               enum: [catering, additionalItem, programType, accomodationRate, accomodationType, accomodationService, travelType]
-#               example: "additionalItem"
-#               description: |
-#                 A törzsadat típusának a neve.
-#                 # Alap törzsadat típus
-#                 Olyan törzsadatok, amelyek leírással is rendelkeznek
-#                   * `catering` - Ellátás megnevezése és leírása (pl.: önellátás, reggeli, félpanzió)
-#                   * `additionalItem` - Felárak megnevezése és leírása (pl.: Elsőbbségi beszállás; Atlasz Classic Kalkulált biztosítás)
-#                   * `programType` - Program megnevezése és leírása (pl.: repülőjegy, hajóút, körutazás)
-#                   * `accomodationRate` - Szállásbesorolás megnevezése és leírása (pl.: 2*+, A kategória, 5*)
-#                   * `accomodationType` - Szállástípus megnevezése és leírása (pl.: apartman, hotel, butikhotel)
-#                   * `accomodationService` - Szállásszolgáltatás megnevezése és leírása. Ezekbe beletartoznak az szállás szoba- és sportszolgáltatásai is. (pl.: parkoló, medencebár, vasaló)
-#                   * `travelType` - Utazási mód megnevezése és leírása (pl.: autóbusszal, egyénileg)
-#             descriptionID:
-#               type: integer
-#               format: int32
-#               minimum: 0
-#               maximum: 65535
-#               description: A leírás törzsadat id-ja
-#               example: 6712
-#             tag:
-#               type: array
-#               items:
-#                 type: string
-#                 minLength: 3
-#                 maxLength: 32
-#                 example: "BBP"
-#                 description: |
-#                 Olyan szabadszavas cimkék, amelyek segítenek a törzsadat kategorizálásában. (pl.: BBP, repülőgéppel [utazási módnál], 4* [4*+ szállásbesorolásnál])
-
-#     _location-data:
-#        allOf:
-#         - $ref: '#/components/schemas/_base-data'
-#         - $ref: '#/components/schemas/_gps-position-data'
-#         - type: object
-#           required:
-#             - lat
-#             - long
-#             - zoom
-#             - descriptionID
-#             - type
-#             - subtype
-#           properties: 
-#             parentID:
-#               type: integer
-#               format: int32
-#               minimum: 0
-#               maximum: 65535
-#               example: 67
-#               description: A szülő törzsadat azonosítója, a fa struktúra létrehozásához. 'country' subtype esetén nem kötelező
-#             descriptionID:
-#               type: integer
-#               format: int32
-#               minimum: 0
-#               maximum: 65535
-#               example: 556
-#               description: A leírás törzsadat azonosítója. Csak type=description az érvényes
-#             type:
-#               type: string
-#               enum: [city, region, country]
-#               example: "location"
-#               description: |
-#                 A törzsadat típusának a neve.
-#                 # Lokáció törzsadat típus
-#                 Olyan törzsadatok, amelyek egy helyszínt jelölnek (pl.: város, ország)
-#                 A törzsadat fa három szintű, így az egyéb szinteket (pl.: POI, városrész) a város alá soroltuk be.
-#                 A lokáció típusa:
-#                   * `city` - város, városrész, látványosság
-#                   * `region` - földrajzi, közigazgatási vagy történelmi régió
-#                   * `country` - független állam, lásd: https://hu.wikipedia.org/wiki/Kontinensek_%C3%A9s_orsz%C3%A1gok_list%C3%A1ja 
-
-#     _data-messages:
-#       allOf:
-#         - $ref: '#/components/schemas/_server-message'
-#         - type: object
-#           description: Egy objektum sikertelen lekérdezése esetén ezt a struktúrát adja vissza a szerver
-#           required:
-#             - type
-#             - requestedObjectID
-#           properties:
-#             requestedObjectID:
-#               type: integer
-#               format: int32
-#               minimum: 0
-#               maximum: 65535
-#               description: A kérésben szereplő objektum ID, ami alapján a kérés elindult
-#               example: 742
-#             type:
-#               type: string
-#               enum: [errorCode]
-#               description: |
-#                 Amennyiben a szervernek nem sikerült a kérésben szereplő ID alapján legenerálni az objektumot, minden esetben `errorCode`
-
-
-#     _departure-head:
-#       type: object
-#       required:
-#         - departureID
-#         - tripStart
-#         - tripEnd
-#         - days
-#         - nights
-#         - perPersonPrice
-#       properties:
-#         departureID:
-#           type: integer
-#           format: int32
-#           minimum: 0
-#           maximum: 65535
-#           example: 242486
-#           description: Az indulás és úthossz azonosítója
-#         tripStart:
-#           type: string
-#           format: date
-#           description: "Az indulás ISO 8601 formátumú időbélyegzője"
-#           example: "2023-07-10"
-#           externalDocs:
-#             description: "Internet Date/Time Format syntax description"
-#             url: https://www.rfc-editor.org/rfc/rfc3339#section-5.6
-#         tripEnd:
-#           type: string
-#           format: date
-#           description: "A hazaérkezés ISO 8601 formátumú időbélyegzője"
-#           example: "2023-07-17"
-#           externalDocs:
-#             description: "Internet Date/Time Format syntax description"
-#             url: https://www.rfc-editor.org/rfc/rfc3339#section-5.6
-#         days:
-#           type: integer
-#           format: int32
-#           minimum: 1
-#           example: 8
-#           description: A program napjainak száma
-#         nights:
-#           type: integer
-#           format: int32
-#           example: 7
-#           minimum: 0
-#           description: A program éjszakáinak száma.
-
-#     ArrayOfMasterDatas:
-#       type: array
-#       description: |
-#         A törzsadatokat reprezentáló objektum, amiben a különböző típusú adatokat különböző adatstruktúrák jelenítenek meg:
-#           * `option` - A nagybetűs SZEMETES. :') Az az adat, ami nem esik bele a következő kategóriákba, de nélkülözhetetlen. pl.: Sztornó százalék, HUF-EUR kurzus váltó, stb.
-#           * `description-data` - az egyes objektumok leírásai, hosszú szövegettartalmazó alkotórészei. A 'description' típusú törzsadathoz tartoznia KELL egy 'content' tulajdonság, ami magát a leírást tartalmazza, HMTL előformázott szövegként
-#           * `_simple-data` - Ezek a törzsadatok nem rendelkeznek a nevükön kívül ('name' tulajdonság) egyéb tulajdonsággal.
-#             * `roomName` - Lakóegység neve. Az egyszerűség miatt NEM bontjuk további tulajdonságokra (pl.: fekvés [kerti], kilátás [tengerre néző], szint [szuperior]), hanem egyben adjuk meg.
-#             * `quantityName` - Egy tétel mennyiségjelzője. (pl.: /nap; /fő; /foglalás)
-#             * `discountType` - Egy akció típusa. 
-#               Jelenleg 4 akciótípus van a rendszerünkben (ezek lehetnek a 'name' értékek): 
-#               * `Akciós` - nincs az akciónak kiemelt tulajdonsága
-#               * `First minute` - előfoglalási akció
-#               * `Last minute` - közeli indulású vagy korlátozott foglalhatóságú utakra adott akció
-#               * `Nincs akcióban` - "Technikai hack" a katalógus árak időponthoz kötött változtatására. (Pl.: A gyorsan fogyó helyek miatt a referens kéri, hogy 1 hónapig X%-val magasabbak legyenek az árak)
-#           * `_basic-data` - Olyan törzsadatok, amelyek leírással is rendelkeznek, és az budavár tours adminisztrációs rendszerében a "Törzsadat" menüpont alatt találhatóak
-#             * `catering` - Ellátás megnevezése és leírása (pl.: önellátás, reggeli, félpanzió)
-#             * `additionalItem` - Felárak megnevezése és leírása (pl.: Elsőbbségi beszállás; Atlasz Classic Kalkulált biztosítás)
-#             * `programType` - Program megnevezése és leírása (pl.: repülőjegy, hajóút, körutazás)
-#             * `accomodationRate` - Szállásbesorolás megnevezése és leírása (pl.: 2*+, A kategória, 5*)
-#             * `accomodationType` - Szállástípus megnevezése és leírása (pl.: apartman, hotel, butikhotel)
-#             * `accomodationService` - Szállásszolgáltatás megnevezése és leírása. Ezekbe beletartoznak az szállás szoba- és sportszolgáltatásai is. (pl.: parkoló, medencebár, vasaló)
-#             * `travelType` - Utazási mód megnevezése és leírása (pl.: autóbusszal, egyénileg)
-#           * `_location-data` - Olyan törzsadatok, amelyek egy helyszínt jelölnek (pl.: város, ország). A törzsadat fa három szintű, így az egyéb szinteket (pl.: POI, városrész) a város alá soroltuk be.  
-#             A lokáció típusa:
-#               * `city` - város, városrész, látványosság
-#               * `region` - földrajzi, közigazgatási vagy történelmi régió
-#               * `country` - független állam, lásd: [Wikipedia]:https://hu.wikipedia.org/wiki/Kontinensek_%C3%A9s_orsz%C3%A1gok_list%C3%A1ja "Kontinensek és országok listája" [Wikipedia]
-#           * `_data-messages` - Egy objektum sikertelen lekérdezése esetén ezt a struktúrát adja vissza a szerver
-#             - `code` - Szerver üzenethez tartozó hibakód
-#             - `text` - A szerver hibakódhoz tartozó részletes leírás
-#             - `requestedObjectID` - A kérésben szereplő objektum ID, ami alapján a kérés elindult
-#             - `type` - Amennyiben a szervernek nem sikerült a kérésben szereplő ID alapján legenerálni az objektumot, minden esetben **errorCode**
-#       minItems: 1
-#       items:
-#         oneOf:
-#         - $ref: '#/components/schemas/_option'
-#         - $ref: '#/components/schemas/_description-data'
-#         - $ref: '#/components/schemas/_simple-data'
-#         - $ref: '#/components/schemas/_basic-data'
-#         - $ref: '#/components/schemas/_location-data'
-#         - $ref: '#/components/schemas/_data-messages'
-
-#     ProgamScheme:
-#       allOf:
-#         - $ref: '#/components/schemas/_base-data'
-#         - type: object
-#           required:
-#             - arrayOfDepartures
-#             - dailyBestPrice
-#             - locations
-#             - arrayOfChildMaxAges
-#             - gallery
-#             - arrayOfdescriptionIDs
-#             - properties
-#           properties:
-#             arrayOfDepartures:
-#               type: array
-#               description: A program indulási dátumai, úthosszai és a hozzájuk tartozó legjobb árak adatai
-#               items:
-#                 type: object
-#                 allOf:
-#                   - $ref: '#/components/schemas/_departure-head'
-#                   - type: object
-#                     required:
-#                       - fullPrice
-#                     properties:
-#                       fullPrice:
-#                         type: integer
-#                         format: int64
-#                         minimum: 0
-#                         example: 349990
-#                         description: Az adott indulási nap és úthossz esetén a *kötelező elemeket tartalmazó* legolcsóbb foglalható szoba, teljes, fejenkénti ára
-#                       discountPrice:
-#                         type: integer
-#                         format: int64
-#                         minimum: 0
-#                         example: 319990
-#                         description: Az adott indulási nap és úthossz esetén a *kötelező elemeket tartalmazó* legolcsóbb foglalható szoba, kedvezményes, fejenkénti ára
-#                       discountID:
-#                         type: integer
-#                         format: int32
-#                         minimum: 0
-#                         maximum: 65535
-#                         example: 991
-#                         description: Az induláshoz és úthosszhoz tartozó legjobb ár akció típusának ID-je
-#                       discountPriceValidUntil:
-#                         type: string
-#                         format: date
-#                         description: "A 'discountPrice' ár érvényessége végének az ISO 8601 formátumú időbélyegzője"
-#                         example: "2023-07-10"
-#                         externalDocs:
-#                           description: "Internet Date/Time Format syntax description"
-#                           url: https://www.rfc-editor.org/rfc/rfc3339#section-5.6
-#             locations:
-#               type: object
-#               description: A program által érintett helyszínek listája
-#               required:
-#                 - departure
-#                 - arrival
-#               properties:
-#                 departure:
-#                   description: A program indulásának helyszíne
-#                   type: object
-#                   required:
-#                     - cityID
-#                     - countryID
-#                   properties:
-#                     cityID:
-#                       type: integer
-#                       format: int32
-#                       minimum: 0
-#                       maximum: 65535
-#                       description: A program indulási városa
-#                     countryID:
-#                       type: integer
-#                       format: int32
-#                       minimum: 0
-#                       maximum: 65535
-#                       description: A program indulásái városának országa
-#                     regionID:
-#                       type: integer
-#                       format: int32
-#                       minimum: 0
-#                       maximum: 65535
-#                       description:  A program indulásái városának régiója. Elhagyható tulajdonság
-#                 arrival:
-#                   type: object
-#                   description: A program desztinációjának első helyszínei
-#                   required:
-#                     - cityID
-#                     - countryID
-#                   properties:
-#                     cityID:
-#                       type: integer
-#                       format: int32
-#                       minimum: 0
-#                       maximum: 65535
-#                       description: A program desztinációjának első városa
-#                     countryID:
-#                       type: integer
-#                       format: int32
-#                       minimum: 0
-#                       maximum: 65535
-#                       description: A program desztinációjának első városának országa
-#                     regionID:
-#                       type: integer
-#                       format: int32
-#                       minimum: 0
-#                       maximum: 65535
-#                       description: A program desztinációjának első városának régiója
-#                 arrayOfOtherIDs:
-#                   type: array
-#                   oneOf:
-#                     - minItems: 1
-#                   items: 
-#                       type: integer
-#                       format: int32
-#                       minimum: 0
-#                       maximum: 65535
-#                       description: "A program által érintett város ID-jeinek listája"
-#             arrayOfChildMaxAges:
-#               type: array
-#               minItems: 1
-#               description: |
-#                 Az egyes gyerekek maximum életkora. A tömb a maximum gyerekkapacitással rendelkező szoba maximum életkorait tartalmazza.  
-#                 **pl.: `[12,6]` jelentése:**
-#                 * 1. gyerek max. 12 éves korig kaphat gyerekárat
-#                 * 2. gyerek max. 6 éves korig kaphet gyerekárat
-#                 Ezek az életkor limitek szállásonként globálisan vannak beállítva, nem függenek a szoba típúsától, de a szoba típúsa meghatározza a kapacitást.  
-#                 ##### Tájékoztató jellegű információ, a pontos kapacitás az árak táblázatban, a /programs/{id*}/prices hívással érhető el  
-#               example: "[12,6]"
-#               items:
-#                 type: integer
-#                 format: int32
-#                 minimum: 2
-#                 exclusiveMaximum: 19
-#             gallery:
-#               type: object
-#               description: "A programsémához tartozó kép- és videogaléria"
-#               required:
-#                 - arrayOfImages
-#               properties:
-#                 video:
-#                     type: string
-#                     format: uri
-#                     description: "A programsémához tartozó video URI címe, amely egy videomegosztó (youtube, vimeo, stb) 'embedd' URL-jét tartalmazza. A tulajdonság elhagyható."
-#                     example: "https://www.youtube.com/embed/yMJu-Vvl71M?enablejsapi=1"
-#                 arrayOfImages:
-#                   type: array
-#                   minItems: 1
-#                   description: "A programhoz tartozó képek elérhetőségének és azok leírásainak a listája. A képek a www.budavartours.hu weboldalon található sorrendben vannak a tömbben"
-#                   items:
-#                     type: object
-#                     required:
-#                       - uri
-#                     properties:
-#                       uri:
-#                         type: string
-#                         format: uri
-#                         description: "A kép URI elérhetősége a cdn.budavartours.hu szerveren"
-#                         pattern: 'https\:\/\/cdn\.budavartours\.hu\/.*?$'
-#                         example: "https://cdn.budavartours.hu/binaries/content/gallery/budavar/programs/programscheme/szlovakia/pozsony/koronazasi-unnepseg-pozsonyban/1280px-eisenstadt_-_schloss_esterhazy.jpg"
-#                       descriptionID:
-#                         type: integer
-#                         format: int32
-#                         minimum: 0
-#                         maximum: 65535
-#                         example: 333
-#                         description: A képhez tartozó magyarázó szövege. (Nem egyenlő a kép HTML title attributumával)
-#             arrayOfDescriptionIDs:
-#               type: array
-#               minItems: 2
-#               description: |
-#                 A programsémához tartozó leírások. Ezek az adminiszttrációs rendszerben felvett Programsémához tartozó összes leírás és az Alapprogramhoz tartozó összes leírás.  
-#                 A leírás ID sorrendje megegyezik a www.budavartours.hu oldalon található szövegek megjelenési sorrendjével.  
-#                 Legalább kettő ID-t kell tartalmaznia a tömbnek, amelyek:
-#                   * index 0: programséma leírás
-#                   * index 1: alapprogram leírás
-#               items:
-#                 type: integer
-#                 format: int32
-#                 minimum: 0
-#                 maximum: 65535
-#                 example: 343
-#             properties:
-#               type: object
-#               requied:
-#                 - arrayOfcateringIDs
-#                 - programTypeID
-#                 - arrayOfTravelModeIDs
-#                 - arrayOfAccomodations
-#               properties:
-#                 arrayOfcateringIDs:
-#                   type: array
-#                   minItems: 1
-#                   description: A programsémához tartozó összes (szezonális is) ellátás ID-je.
-#                   items:
-#                     type: integer
-#                     format: int32
-#                     minimum: 0
-#                     maximum: 65535
-#                 programTypeID:
-#                   type: integer
-#                   format: int32
-#                   minimum: 0
-#                   maximum: 65535
-#                   description: A programsémához tartozó programtípus ID-je.
-#                 arrayOfTravelModeIDs:
-#                   type: array
-#                   minItems: 1
-#                   description: A programsémához tartozó összes utazási mód ID-je.
-#                   items: 
-#                     type: integer
-#                     format: int32
-#                     minimum: 0
-#                     maximum: 65535
-#                 arrayOfAccomodations:
-#                   type: array
-#                   minItems: 1
-#                   description: A programsémához tartozó szállások listája
-#                   items:
-#                     allOf:
-#                       - $ref: '#/components/schemas/_base-data'
-#                       - type: object
-#                         requied:
-#                         - name
-#                         - ratingID
-#                         - typeID
-#                         - location
-#                         - arrayOfServiceIDs
-#                         - arrayOfDescriptionIDs
-#                         properties:
-#                           name:
-#                             type: string
-#                             minLength: 3
-#                             maxLength: 128
-#                             description: "A szállás neve"
-#                           ratingID:
-#                             type: integer
-#                             format: int32
-#                             minimum: 0
-#                             maximum: 65535
-#                             example: 691
-#                             description: |
-#                               A szállás besorolásának ID-je  
-#                               pl.: 5*
-#                           typeID:
-#                             type: integer
-#                             format: int32
-#                             minimum: 0
-#                             maximum: 65535
-#                             example: 697
-#                             description: |
-#                               A szállás típusának ID-je  
-#                               pl.: Hotel
-#                           arrayOfServiceIDs:
-#                             type: array
-#                             description: "A szálláshoz tartozó szállás-, szoba- és sportszolgáltatások ID-i."
-#                             nullable: true
-#                             items: 
-#                               type: integer
-#                               format: int32
-#                               minimum: 0
-#                               maximum: 65535
-#                               description: "A szolgáltatás ID-je"
-#                           location:
-#                             allOf:
-#                               - $ref: '#/components/schemas/_gps-position-data'
-#                               - type: object
-#                                 description: |
-#                                   A szállás helye: 
-#                                     * ország
-#                                     * város
-#                                     * régió
-#                                     * GPS koordináták
-#                                 required:
-#                                   - cityID
-#                                   - countryID
-#                                 properties:
-#                                   cityID:
-#                                     type: integer
-#                                     format: int32
-#                                     minimum: 0
-#                                     maximum: 65535
-#                                     description: A város ID-je, ahol a szállás található.
-#                                   countryID:
-#                                     type: integer
-#                                     format: int32
-#                                     minimum: 0
-#                                     maximum: 65535
-#                                     description: Az ország ID-je, ahol a szállás található.
-#                                   regionID:
-#                                     type: integer
-#                                     format: int32
-#                                     minimum: 0
-#                                     maximum: 65535
-#                                     description: A régió ID-je, ahol a szállás található. Elhagyható.
-#                           arrayOfDescriptionIDs:
-#                             type: array
-#                             minItems: 1
-#                             description: A szállás leírásait tartlamazó törzsadatok ID-i
-#                             items:
-#                               type: integer
-#                               format: int32
-#                               minimum: 0
-#                               maximum: 65535
-#                               example: 2399
-
-#     ProgramPrices:
-#       allOf:
-#         - $ref: '#/components/schemas/_base-data'
-#         - type: object
-#           required:
-#             - arrayOfDiscounts
-#             - arrayOfDatesAndPrices
-#             - arrayOfAdditionalItems
-#           properties:
-#             arrayOfDatesAndPrices:
-#               type: array
-#               items:
-#                 allOf:
-#                   - $ref: '#/components/schemas/_departure-head'
-#                   - type: object
-#                     required:
-#                       - isBestPriceOfDate
-#                       - arrayOfAdditionalItemIDs
-#                       - arrayOfCateringIDs
-#                       - capacityVector
-#                       - departureCityID
-#                       - roomNameID
-#                       - fullPrice
-#                       - discountID
-#                     properties:
-#                       isBestPriceOfDate:
-#                         type: boolean
-#                         example: true
-#                         description: "Az adott dátum és úthossz legjobb fejenkénti ára vagy sem"
-#                       arrayOfAdditionalItemIDs:
-#                         type: array
-#                         minItems: 1
-#                         description: |
-#                           Az adott indulási dátum és úthossz párhoz tartozó felárak listája.  
-#                           A lista 'arrayOfAdditionalItems' tömb, az ID a tömb indexe
-#                         example: [342,343,344,254,616,786]
-#                         items:
-#                           type: integer
-#                           format: int32
-#                           minimum: 0
-#                           maximum: 65535
-#                       arrayOfCateringIDs:
-#                         type: array
-#                         description: |
-#                           Az adott indulási dátum és úthossz párhoz tartozó ellátások ID-jei
-#                         minItems: 1
-#                         example: [879,414]
-#                         items:
-#                           type: integer
-#                           format: int32
-#                           minimum: 0
-#                           maximum: 65535
-#                       capacityVector:
-#                         type: object
-#                         required:
-#                           - adultsOnMainBed
-#                           - adultsOnExtraBed
-#                           - childOnExtraBed
-#                           - childAges
-#                         description: |
-#                           Az adott indulási dátum, úthossz párhoz tartozó szobának a kapacitás vektora
-#                         example: {adultsOnMainBed: 1, adultsOnExtraBed: 0, childOnExtraBed: 0}
-#                         properties:
-#                           adultsOnMainBed:
-#                             type: integer
-#                             description: Felnőttek száma főágyon
-#                             format: int32
-#                             minimum: 1
-#                             maximum: 10
-#                           adultsOnExtraBed:
-#                             type: integer
-#                             description: Felnőttek száma pótágyon
-#                             format: int32
-#                             minimum: 0
-#                             maximum: 10
-#                           childOnExtraBed:
-#                             type: integer
-#                             description: Gyerek száma pótágyon
-#                             format: int32
-#                             minimum: 0
-#                             maximum: 10
-#                           childAges:
-#                             type: array
-#                             description: |
-#                               A pótágyon lévő gyerek minimum és maximum életkor párja.
-#                             example: [[2,12],[2,12]]
-#                             items:
-#                               type: array
-#                               example: [2,12]
-#                               items:
-#                                 type: integer
-#                                 format: int32
-#                                 minimum: 2
-#                                 exclusiveMaximum: 19
-#                       departureCityID:
-#                         type: integer
-#                         description: Az indulási város ID-je
-#                         example: 1881
-#                         format: int32
-#                         minimum: 0
-#                         maximum: 65535
-#                       roomNameID:
-#                         type: integer
-#                         description: A szoba nevének ID-je
-#                         example: 2385
-#                         format: int32
-#                         minimum: 0
-#                         maximum: 65535
-#                       fullPrice:
-#                         type: integer
-#                         description: Az adott időpont-úthossz páron lévő, minden utazót és kötelező felárat tartalmazó, kedvezmény nélküli ár
-#                         example: 349990
-#                         format: int64
-#                         minimum: 0
-#                       discount:
-#                         type: object
-#                         nullable: true
-#                         required:
-#                           - id
-#                           - discountedPrice
-#                           - type
-#                           - validUntil
-#                         properties:
-#                           id:
-#                             type: integer
-#                             description: "Referencia ID, az admin rendszerben lévő ID-vel megegyezik"
-#                             format: int32
-#                             minimum: 0
-#                             maximum: 65535
-#                             example: 4519
-#                           discountedPrice:
-#                             type: integer
-#                             description: Az adott időpont-úthossz páron lévő, kötelező felárat tartalmazó, kedvezményes ár
-#                             format: int64
-#                             minimum: 0
-#                             example: 329490
-#                           type:
-#                             type: integer
-#                             description: A törzsadatokban lévő akció típus ID-je
-#                             format: int32
-#                             minimum: 0
-#                             maximum: 65535
-#                             example: 943
-#                           validUntil:
-#                             type: string
-#                             format: date
-#                             nullable: true
-#                             description: |
-#                               Az akció érvényességének végét jelző ISO 8601 formátumú időbélyegző.  
-#                               pl.: 2023-07-10 => magyar idő szerint 2023-07-10 23:59:59 után a kedvezményes ár már nem használható, helyette (a következő frissítésig) a 'fullPrice' ár használandó.  
-#                               Amennyiben nincs az akciónak lejárata, az érték null
-#                             example: "2023-07-10"
-#                             externalDocs:
-#                               description: "Internet Date/Time Format syntax description"
-#                               url: https://www.rfc-editor.org/rfc/rfc3339#section-5.6
-
-
-#             arrayOfAdditionalItems:
-#               type: array
-#               description: Az összes indulási időponthoz tartozó összes felár listája
-#               items:
-#                 type: object
-#                 properties:
-#                   additionalItemID:
-#                     type: integer
-#                     description: A felár nevének (törzsadat) ID-je
-#                     format: int32
-#                     minimum: 0
-#                     maximum: 65535
-#                   isMandantory:
-#                     type: boolean
-#                     description: A felár 'Kötelező' tulajdonsága
-#                   isCountInStorno:
-#                     type: boolean
-#                     description: A felár 'Sztornó' tulajdonsága
-#                   isDivisibleByPerson:
-#                     type: boolean
-#                     description: A felár 'Osztható' tulajdonsága
-#                   unitID:
-#                     type: integer
-#                     description: A felár 'Típus' tulajdonság értékének ID-je
-#                     format: int32
-#                     minimum: 0
-#                     maximum: 65535
-#                   textReplacement:
-#                     type: integer
-#                     description: A felár 'Memo' tulajdonság értékének ID-je
-#                     format: int32
-#                     minimum: 0
-#                     maximum: 65535
-#                   tag:
-#                     type: integer
-#                     description: |
-#                       A felár 'Csoport' tulajdonság értékének ID-je  
-#                       Segítségével a felárakat csoportosítani lehet
-#                     format: int32
-#                     minimum: 0
-#                     maximum: 65535
-#                   cateringID:
-#                     type: array
-#                     description: |
-#                       A felár melyik ellátás esetén érvényes. 
-#                       ---
-#                       Szűrők:
-#                         1. ellátás
-#                         2. úthossz
-#                         3. érvényes -tól
-#                         4. érvényes -ig
-#                       Az 2-4-es szűrők az egyes indulási időpontoknál feltüntetett felár vektorban valósulnak meg.  
-#                       pl.: ha egy úthossz (2) szűrő miatt nem lehet érvényes a felár az adott időpont-úthossz kombinációban, akkor az eleve kimarad a listából.
-#                     nullable: true
-#                     items:
-#                       type: integer
-#                       format: int32
-#                       minimum: 0
-#                       maximum: 65535
-#                   prices:
-#                     type: object
-#                     properties:
-#                       adult:
-#                         type: integer
-#                         format: int64
-#                         minimum: 0
-#                         example: 349990
-#                         description: Az adott felár felnőtt ára
-#                       children:
-#                         type: integer
-#                         format: int64
-#                         minimum: 0
-#                         example: 349990
-#                         description: Az adott felár gyerek ára
-#     ProgramsPrices:
-#       type: array
-#       items:
-#         $ref: '#/components/schemas/ProgramPrices'
-#         minItems: 1
-#         maxItems: 1024
-
-#   securitySchemes:
-#     BVT_auth:
-#       type: http
-#       scheme: basic
-
-#   parameters:
-    
-#     idParam:
-#       name: id
-#       in: path
-#       description: Egy objektum azzonosítója
-#       required: true
-#       schema:
-#         type: integer
-#         format: int32
-#         minimum: 0
-#         maximum: 65535
-#         example: 329
-    
-#     locationParam:
-#       name: locationID
-#       in: path
-#       description: Egy, a törzsadataokban szereplő lokáció ID
-#       required: true
-#       schema:
-#         type: integer
-#         format: int32
-#         minimum: 0
-#         maximum: 65535
-#         example: 679
-
-#     dateParam:
-#       name: date
-#       in: path
-#       description: Egy, a törzsadataokban szereplő lokáció ID
-#       required: true
-#       schema:
-#         type: integer
-#         format: int32
-#         minimum: 0
-#         maximum: 65535
-#         example: 679
-
-#   requestBodies:
-#   responses:
-#     200ProgramsSchemas:
-#       description: "Sikeres válasz"
-#       content:
-#         application/json:
-#           schema:
-#             $ref: '#/components/schemas/ProgramPrices'        
-
-#   headers:
-#   examples:
-#   links:
-#   callbacks:
+                  example: "/data/base/basicData/586"
+                  description: A programsémához tartozó programtípus ID-je.
+                arrayOfTravelModesID:
+                  type: array
+                  minItems: 1
+                  description: A programsémához tartozó összes utazási mód ID-je.
+                  items:
+                    type: string
+                    format: uri
+                    example: "/data/base/basicData/556"
+                arrayOfAccomodations:
+                  type: array
+                  minItems: 1
+                  description: A programsémához tartozó szállások listája
+                  items:
+                    allOf:
+                      - $ref: "#/components/schemas/selfRef"
+                      - $ref: "#/components/schemas/GPSPosition"
+                      - type: object
+                        required:
+                          - name
+                          - ratingID
+                          - typeID
+                          - location
+                          - arrayOfServiceIDs
+                          - arrayOfDescriptionIDs
+                        properties:
+                          name:
+                            type: string
+                            minLength: 3
+                            maxLength: 128
+                            description: "A szállás neve"
+                          ratingID:
+                            type: string
+                            format: uri
+                            example: "/data/base/tags/556"
+                            description: |
+                              A szállás besorolásának ID-je  
+                              pl.: 5*
+                          typeID:
+                            type: string
+                            format: uri
+                            example: "/data/base/tags/556"
+                            description: |
+                              A szállás típusának ID-je  
+                              pl.: Hotel
+                          arrayOfServiceIDs:
+                            type: array
+                            description: "A szálláshoz tartozó szállás-, szoba- és sportszolgáltatások ID-i."
+                            nullable: true
+                            items:
+                              type: string
+                              format: uri
+                              example: "/data/base/tags/559"
+                              description: "A szolgáltatás ID-je"
+                          location:
+                            allOf:
+                              - $ref: "#/components/schemas/GPSPosition"
+                              - type: object
+                                description: |
+                                  A szállás helye: 
+                                    * ország
+                                    * város
+                                    * régió
+                                    * GPS koordináták
+                                required:
+                                  - cityID
+                                  - countryID
+                                properties:
+                                  cityID:
+                                    type: string
+                                    format: uri
+                                    example: "/data/locations/cities/556"
+                                    description: A város ID-je, ahol a szállás található.
+                                  countryID:
+                                    type: string
+                                    format: uri
+                                    example: "/data/locations/ccountries/556"
+                                    description: Az ország ID-je, ahol a szállás található.
+                                  regionID:
+                                    type: string
+                                    format: uri
+                                    example: "/data/locations/regions/556"
+                                    description: A régió ID-je, ahol a szállás található. Elhagyható.
+                          arrayOfDescriptionIDs:
+                            type: array
+                            minItems: 1
+                            description: A szállás leírásait tartlamazó törzsadatok ID-i
+                            items:
+                              type: string
+                              format: uri
+                              example: "/data/base/cities/556"
