@@ -1072,16 +1072,16 @@ components:
       description: Az objektum azonosítója
       example: 3755
 
-    selfRef:
+    refId:
       type: string
       format: uri
       description: Az objektumot azonosító REST API hívás, amely NEM tartlamazza a domaint és az api verziót.
       example: "/data/base/basicDatas/3755"
 
-    serverMessages:
+    serverMessage:
       allOf:
         - $ref: "#/components/schemas/id"
-        - $ref: "#/components/schemas/selfRef"
+        - $ref: "#/components/schemas/refId"
         - type: object
           properties:
             status:
@@ -1102,7 +1102,7 @@ components:
               description: A hibakódhoz tartozó részletes leírás
               example: "The object does not exist. Refresh baseData and try again"
 
-    options:
+    option:
       allOf:
         - $ref: "#/components/schemas/id"
         - type: object
@@ -1111,16 +1111,21 @@ components:
               type: string
               maxLength: 128
               description: Az obejktum neve
+              example: Sztornó
             value:
+              description: |
+                **Globális beállítás**  
+                pl.: Sztornó százalék, HUF-EUR kurzus váltó, stb.
               oneOf:
                 - type: string
                   maxLength: 128
+                  example: "valami"
                 - type: number
                   format: float
-                  description: |-
-                    **Globális beállítás**  
-                    pl.: Sztornó százalék, HUF-EUR kurzus váltó, stb.
                   example: 0.025
+                - type: number
+                  format: int64
+                  example: 6
             type:
               type: string
               enum: [STORNO, CURRENCY_CHANGE]
@@ -1128,13 +1133,18 @@ components:
                 A törzsadat típusának a neve.  
                 **Globális beállítás**  
                  pl.: Sztornó százalék, HUF-EUR kurzus váltó, stb.
-              example: "option"
+              example: "STORNO"
 
-    descriptions:
+    description:
       allOf:
         - $ref: "#/components/schemas/id"
+        - $ref: "#/components/schemas/refId"
         - type: object
           properties:
+            title:
+              type: string
+              maxLength: 128
+              description: "A leírás címe. Ezt nem kell feltétlenül megjeleníteni"
             content:
               type: string
               maxLength: 8192
@@ -1146,21 +1156,28 @@ components:
               type: string
               enum:
                 [
+                  ACCOMODATION,
                   CITY,
                   REGION,
                   COUNTY,
                   OPTIONAL_PROGRAM,
                   PROGRAM_SCHEME,
-                  ACCOMODATION,
                   BASE_DATA,
                 ]
               description: |-
                 A törzsadat típusának a neve.  
                 **Leírás törzsadat típus**  
                 A 'description' típusú törzsadathoz tartoznia KELL egy 'content' tulajdonság, ami magát a leírást tartalmazza, HMTL előformázott szövegként
+                  * `ACCOMODATION` - Szálláshoz tartozó leírás
+                  * `CITY` - Város lokációhoz tartozó leírás
+                  * `REGION` - Régió lokációhoz tartozó leírás
+                  * `COUNTY` - Ország lokációhoz tartozó leírás
+                  * `OPTIONAL_PROGRAM` - Fakultatív programhoz tartozó leírás
+                  * `PROGRAM_SCHEME` - Programsémához tartozó leírás
+                  * `BASE_DATA` - Törzsadathoz tartozó leírás
               example: "CITY"
 
-    basicDatas:
+    basicData:
       allOf:
         - $ref: "#/components/schemas/id"
         - type: object
@@ -1196,100 +1213,111 @@ components:
             descriptionID:
               oneOf:
                 - $ref: "#/components/schemas/id"
-            tagsIDs:
-              type: array
-              minItems: 0
-              items:
-                oneOf:
-                  - $ref: "#/components/schemas/id"
 
     tags:
       allOf:
-        - $ref: "#/components/schemas/selfRef"
+        - $ref: "#/components/schemas/id"
         - type: object
           properties:
             type:
               type: string
-              enum: [roomName, quantityName, discountType, memo]
-              example: "roomName"
+              enum: [ROOMNAME, QUANTITYNAME, DISCOUNTTYPE, MEMO]
+              example: "ROOMNAME"
               description: |
                 A törzsadat típusának a neve.
                 # Egyszerű törzsadat típus
                 Ezek a törzsadatok nem rendelkeznek a nevükön kívül ('name' tulajdonság) egyéb tulajdonsággal.
-                * `roomName` - Lakóegység neve. Az egyszerűség miatt NEM bontjuk további tulajdonságokra (pl.: fekvés [kerti], kilátás [tengerre néző], szint [szuperior]), hanem egyben adjuk meg.
-                * `quantityName` - Egy tétel mennyiségjelzője. (pl.: /nap; /fő; /foglalás)
-                * `discountType` - Egy akció típusa. 
+                * `ROOMNAME` - Lakóegység neve. Az egyszerűség miatt NEM bontjuk további tulajdonságokra (pl.: fekvés [kerti], kilátás [tengerre néző], szint [szuperior]), hanem egyben adjuk meg.
+                * `QUANTITYNAME` - Egy tétel mennyiségjelzője. (pl.: /nap; /fő; /foglalás)
+                * `DISCOUNTTYPE` - Egy akció típusa. 
                   Jelenleg 4 akciótípus van a rendszerünkben: 
-                    - `Akciós` - nincs az akciónak kiemelt tulajdonsága
-                    - `First minute` - előfoglalási akció
-                    - `Last minute` - közeli indulású vagy korlátozott foglalhatóságú utakra adott akció
-                    - `Nincs akcióban` - "Technikai hack" a katalógus árak időponthoz kötött változtatására. (Pl.: A gyorsan fogyó helyek miatt a referens kéri, hogy 1 hónapig X%-val magasabbak legyenek az árak)  
-                * `memo` - Felárak esetében van egy "Memo" tulajdonság, ami a 0 forintos tételek esetén az ár helyett jelenik meg.  
+                    - `AKCIÓS` - nincs az akciónak kiemelt tulajdonsága
+                    - `FIRST MINUTE` - előfoglalási akció
+                    - `LAST MINUTE` - közeli indulású vagy korlátozott foglalhatóságú utakra adott akció
+                    - `NINCS AKCIÓBAN` - "Technikai hack" a katalógus árak időponthoz kötött változtatására. (Pl.: A gyorsan fogyó helyek miatt a referens kéri, hogy 1 hónapig X%-val magasabbak legyenek az árak)  
+                * `MEMO` - Felárak esetében van egy "Memo" tulajdonság, ami a 0 forintos tételek esetén az ár helyett jelenik meg.  
                   pl.: "0 ft/foglalás" helyett "Ajándék!"  
                   Az ár számítás továbbra is 0 Ft-tal történik.
 
     GPSPosition:
-      type: object
-      description: GPS koordinátákat reprezentáló objektum
-      properties:
-        latitude:
-          type: number
-          format: float
-          minimum: -90
-          maximum: 90
-          nullable: true
-          description: A GPS koordináta 'latitude' komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 0
-          example: 47.5059676
-        longitude:
-          type: number
-          format: float
-          minimum: -180
-          maximum: 180
-          nullable: true
-          description: A GPS koordináta 'longitude' komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 0
-          example: 19.0376893
-        zoom:
-          type: number
-          format: float
-          minimum: 1
-          maximum: 20
-          nullable: true
-          description: A GPS koordináta 'zoom' vagy magasság komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 1
-          example: 14.8
-
-    locations:
       allOf:
-        - $ref: "#/components/schemas/selfRef"
+        - $ref: "#/components/schemas/id"
+        - type: object
+          description: GPS koordinátákat reprezentáló objektum
+          properties:
+            latitude:
+              type: number
+              format: float
+              minimum: -90
+              maximum: 90
+              nullable: true
+              description: A GPS koordináta 'latitude' komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 0
+              example: 47.5059676
+            longitude:
+              type: number
+              format: float
+              minimum: -180
+              maximum: 180
+              nullable: true
+              description: A GPS koordináta 'longitude' komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 0
+              example: 19.0376893
+            zoom:
+              type: number
+              format: float
+              minimum: 1
+              maximum: 20
+              nullable: true
+              description: A GPS koordináta 'zoom' vagy magasság komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 1
+              example: 14.8
+
+    location:
+      allOf:
+        - $ref: "#/components/schemas/id"
         - $ref: "#/components/schemas/GPSPosition"
         - type: object
           properties:
-            parentID:
+            name:
+              type: string
+              minLength: 3
+              maxLength: 128
+              description: "A lokáció neve"
+            parentId:
+              oneOf:
+                - $ref: "#/components/schemas/id"
+            parentRef:
               type: string
               format: uri
               example: "/data/base/location/9412"
-              description: "A szülő törzsadat azonosítója, a fa struktúra létrehozásához. 'country' subtype esetén nem kötelező"
-            descriptionsID:
-              type: string
-              format: uri
-              example: "/data/base/descriptions/556"
-              description: A leírás törzsadat azonosítója. Csak type=description az érvényes
+              description: "A szülő törzsadatot azonosító hívás. A fa struktúra létrehozásához. 'country' subtype esetén nem kötelező"
+            descriptionIds:
+              type: array
+              minItems: 1
+              items:
+                oneOf:
+                  - $ref: "#/components/schemas/id"
+            descriptionRefs:
+              type: array
+              minItems: 1
+              items:
+                oneOf:
+                  - $ref: "#/components/schemas/refId"
             type:
               type: string
-              enum: [city, region, country]
-              example: "region"
+              enum: [CITY, REGION, COUNTRY]
+              example: "REGION"
               description: |
                 A törzsadat típusának a neve.
                 # Lokáció törzsadat típus
                 Olyan törzsadatok, amelyek egy helyszínt jelölnek (pl.: város, ország)
                 A törzsadat fa három szintű, így az egyéb szinteket (pl.: POI, városrész) a város alá soroltuk be.
                 A lokáció típusa:
-                  * `city` - város, városrész, látványosság
-                  * `region` - földrajzi, közigazgatási vagy történelmi régió
-                  * `country` - független állam, lásd: https://hu.wikipedia.org/wiki/Kontinensek_%C3%A9s_orsz%C3%A1gok_list%C3%A1ja
+                  * `CITY` - város, városrész, látványosság
+                  * `REGION` - földrajzi, közigazgatási vagy történelmi régió
+                  * `COUNTRY` - független állam, lásd: https://hu.wikipedia.org/wiki/Kontinensek_%C3%A9s_orsz%C3%A1gok_list%C3%A1ja
 
     accomodations:
       allOf:
-        - $ref: "#/components/schemas/selfRef"
+        - $ref: "#/components/schemas/refId"
         - $ref: "#/components/schemas/GPSPosition"
         - type: object
           properties:
@@ -1365,7 +1393,7 @@ components:
 
     departuresHead:
       allOf:
-        - $ref: "#/components/schemas/selfRef"
+        - $ref: "#/components/schemas/refId"
         - type: object
           properties:
             departureID:
@@ -1404,7 +1432,7 @@ components:
 
     progamScheme:
       allOf:
-        - $ref: "#/components/schemas/selfRef"
+        - $ref: "#/components/schemas/refId"
         - type: object
           properties:
             arrayOfDepartures:
@@ -1598,7 +1626,7 @@ components:
                   description: A programsémához tartozó szállások listája
                   items:
                     allOf:
-                      - $ref: "#/components/schemas/selfRef"
+                      - $ref: "#/components/schemas/refId"
                       - $ref: "#/components/schemas/GPSPosition"
                       - type: object
                         required:
