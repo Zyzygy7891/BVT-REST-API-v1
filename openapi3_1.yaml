@@ -1065,53 +1065,71 @@ paths:
   # /history/{objectID*}:
 
 components:
+
   schemas:
+
     id:
       type: number
       format: int64
       description: Az objektum azonosítója
-      example: 3755
 
     refId:
       type: string
       format: uri
-      description: Az objektumot azonosító REST API hívás, amely NEM tartlamazza a domaint és az api verziót.
-      example: "/data/base/basicDatas/3755"
+      description: Az objektumot azonosító REST API hívás.
+
+    title:
+      type: string
+      minLength: 3
+      maxLength: 128
+      description: Az objektum megjelenítendő neve.
+
+    timeStamp:
+      type: string
+      format: date-time
+      description: "ISO 8601 időbélyegző"
+      externalDocs:
+        description: "Internet Date/Time Format syntax description"
+        url: https://www.rfc-editor.org/rfc/rfc3339#section-5.6
 
     serverMessage:
-      allOf:
-        - $ref: "#/components/schemas/id"
-        - $ref: "#/components/schemas/refId"
-        - type: object
-          properties:
-            status:
-              type: integer
-              format: int32
-              minimum: 100
-              maximum: 999
-              description: Szerver üzenethez tartozó HTTP kód
-              example: 404
-            message:
-              type: string
-              maxLength: 64
-              description: A hibakód rövid magyarázata
-              example: "Object not found"
-            description:
-              type: string
-              maxLength: 512
-              description: A hibakódhoz tartozó részletes leírás
-              example: "The object does not exist. Refresh baseData and try again"
+      type: object
+      properties:
+        timeStamp:
+          description: A szerver üzenet generálásának időpontja.
+          example: "2023-04-12T23:20:50.52Z"
+          oneOf:
+            - $ref: "#/components/schemas/timeStamp"
+        originalCall:
+          description: A szerver üzenetet generáló eredeti, teljes REST hívás
+          example: GET https://api.budavartours.hu/v1/data/base/basicDatas/8511
+          oneOf:
+            - $ref: "#/components/schemas/refId"
+        status:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 999
+          description: Szerver üzenethez tartozó HTTP kód
+          example: 404
+        message:
+          type: string
+          maxLength: 64
+          description: A hibakód rövid, angol nyelvű magyarázata
+          example: "Object not found"
+        description:
+          type: string
+          maxLength: 512
+          description: A hibakódhoz tartozó angol nyelvű, részletes leírás
+          example: "The object does not exist. Wait 20 seconds and try again"
+
 
     option:
       allOf:
         - $ref: "#/components/schemas/id"
+        - $ref: "#/components/schemas/title"
         - type: object
           properties:
-            name:
-              type: string
-              maxLength: 128
-              description: Az obejktum neve
-              example: Sztornó
             value:
               description: |
                 **Globális beállítás**  
@@ -1139,13 +1157,10 @@ components:
       allOf:
         - $ref: "#/components/schemas/id"
         - $ref: "#/components/schemas/refId"
+        - $ref: "#/components/schemas/title"
         - type: object
           properties:
-            title:
-              type: string
-              maxLength: 128
-              description: "A leírás címe. Ezt nem kell feltétlenül megjeleníteni"
-            content:
+            value:
               type: string
               maxLength: 8192
               description: "Egy objektumhoz tartozó, kiegészítő információkat tartalmazó, HTML előformázott szöveg"
@@ -1180,12 +1195,10 @@ components:
     basicData:
       allOf:
         - $ref: "#/components/schemas/id"
+        - $ref: "#/components/schemas/refId"
+        - $ref: "#/components/schemas/title"
         - type: object
           properties:
-            name:
-              type: string
-              maxLength: 128
-              description: Az obejktum neve
             type:
               type: string
               enum:
@@ -1210,23 +1223,28 @@ components:
                   * `ACCOMODATION_TYPE` - Szállástípus megnevezése és leírása (pl.: apartman, hotel, butikhotel)
                   * `ACCOMODATION_SERVICE` - Szállásszolgáltatás megnevezése és leírása. Ezekbe beletartoznak az szállás szoba- és sportszolgáltatásai is. (pl.: parkoló, medencebár, vasaló)
                   * `TRAVEL_TYPE` - Utazási mód megnevezése és leírása (pl.: autóbusszal, egyénileg)
-            descriptionID:
+            descriptionId:
               oneOf:
                 - $ref: "#/components/schemas/id"
+            descriptionRef:
+              oneOf:
+                  - $ref: "#/components/schemas/refId"
 
     tags:
       allOf:
         - $ref: "#/components/schemas/id"
+        - $ref: "#/components/schemas/refId"
+        - $ref: "#/components/schemas/title"
         - type: object
           properties:
             type:
               type: string
-              enum: [ROOMNAME, QUANTITYNAME, DISCOUNTTYPE, MEMO]
-              example: "ROOMNAME"
+              enum: [ROOM_NAME, QUANTITYNAME, DISCOUNTTYPE, MEMO]
+              example: "ROOM_NAME"
               description: |
                 A törzsadat típusának a neve.
                 # Egyszerű törzsadat típus
-                Ezek a törzsadatok nem rendelkeznek a nevükön kívül ('name' tulajdonság) egyéb tulajdonsággal.
+                Ezek a törzsadatok nem rendelkeznek a nevükön kívül ('title' tulajdonság) egyéb tulajdonsággal.
                 * `ROOMNAME` - Lakóegység neve. Az egyszerűség miatt NEM bontjuk további tulajdonságokra (pl.: fekvés [kerti], kilátás [tengerre néző], szint [szuperior]), hanem egyben adjuk meg.
                 * `QUANTITYNAME` - Egy tétel mennyiségjelzője. (pl.: /nap; /fő; /foglalás)
                 * `DISCOUNTTYPE` - Egy akció típusa. 
@@ -1240,55 +1258,48 @@ components:
                   Az ár számítás továbbra is 0 Ft-tal történik.
 
     GPSPosition:
-      allOf:
-        - $ref: "#/components/schemas/id"
-        - type: object
-          description: GPS koordinátákat reprezentáló objektum
-          properties:
-            latitude:
-              type: number
-              format: float
-              minimum: -90
-              maximum: 90
-              nullable: true
-              description: A GPS koordináta 'latitude' komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 0
-              example: 47.5059676
-            longitude:
-              type: number
-              format: float
-              minimum: -180
-              maximum: 180
-              nullable: true
-              description: A GPS koordináta 'longitude' komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 0
-              example: 19.0376893
-            zoom:
-              type: number
-              format: float
-              minimum: 1
-              maximum: 20
-              nullable: true
-              description: A GPS koordináta 'zoom' vagy magasság komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 1
-              example: 14.8
+      type: object
+      description: GPS koordinátákat reprezentáló objektum
+      properties:
+        latitude:
+          type: number
+          format: float
+          minimum: -90
+          maximum: 90
+          nullable: true
+          description: A GPS koordináta 'latitude' komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 0
+          example: 47.5059676
+        longitude:
+          type: number
+          format: float
+          minimum: -180
+          maximum: 180
+          nullable: true
+          description: A GPS koordináta 'longitude' komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 0
+          example: 19.0376893
+        zoom:
+          type: number
+          format: float
+          minimum: 1
+          maximum: 20
+          nullable: true
+          description: A GPS koordináta 'zoom' vagy magasság komponense. Amennyiben null, az objektum `latitude ÉS longitude ÉS zoom` tulajdonsága is érvénytelen és a szülő objektum parentID-jének a _gps-position-data értékeit kell megkapnia, vagy 1
+          example: 14.8
 
     location:
       allOf:
         - $ref: "#/components/schemas/id"
+        - $ref: "#/components/schemas/refId"
+        - $ref: "#/components/schemas/title"
         - $ref: "#/components/schemas/GPSPosition"
         - type: object
           properties:
-            name:
-              type: string
-              minLength: 3
-              maxLength: 128
-              description: "A lokáció neve"
             parentId:
               oneOf:
                 - $ref: "#/components/schemas/id"
             parentRef:
-              type: string
-              format: uri
-              example: "/data/base/location/9412"
-              description: "A szülő törzsadatot azonosító hívás. A fa struktúra létrehozásához. 'country' subtype esetén nem kötelező"
+              oneOf:
+                  - $ref: "#/components/schemas/refId"
             descriptionIds:
               type: array
               minItems: 1
@@ -1315,46 +1326,65 @@ components:
                   * `REGION` - földrajzi, közigazgatási vagy történelmi régió
                   * `COUNTRY` - független állam, lásd: https://hu.wikipedia.org/wiki/Kontinensek_%C3%A9s_orsz%C3%A1gok_list%C3%A1ja
 
-    accomodations:
+    accomodation:
       allOf:
+        - $ref: "#/components/schemas/id"
         - $ref: "#/components/schemas/refId"
+        - $ref: "#/components/schemas/title"
         - $ref: "#/components/schemas/GPSPosition"
         - type: object
           properties:
-            name:
-              type: string
-              minLength: 3
-              maxLength: 128
-              description: "A szállás neve"
-            ratingID:
-              type: string
-              format: uri
-              example: "/data/base/tag/975"
+            ratingId:
               description: |
-                A szállás besorolásának ID-je  
-                pl.: 5*
-            descriptionsID:
-              type: string
-              format: uri
-              description: Az leírást azonosító hívás
-              example: "/data/base/descriptions/7643"
-            typeID:
-              type: string
-              format: uri
-              example: "/data/base/tag/652"
+                A szállás besorolásának törzsadat ID-je. pl.: 5* azonosítója - 872
+              example: 872
+              oneOf:
+                - $ref: "#/components/schemas/id"
+            ratingRef:
               description: |
-                A szállás típusának ID-je  
-                pl.: Hotel
-            arrayOfServiceIDs:
+                A szállás besorolásának REST API hívása. pl.: 5* hívása - /data/base/basicDatas/872
+              example: /data/base/basicDatas/872
+              oneOf:
+                - $ref: "#/components/schemas/refId"
+            arrayOfDescriptionIds:
               type: array
-              description: "A szálláshoz tartozó szállás-, szoba- és sportszolgáltatások ID-i."
+              minItems: 1
+              items:
+                oneOf:
+                  - $ref: "#/components/schemas/id"
+            arrayOfDescriptionRefs:
+              type: array
+              minItems: 1
+              items:
+                oneOf:
+                  - $ref: "#/components/schemas/refId"
+            arrayOfTypeIds:
+              type: array
+              minItems: 1
+              items:
+                oneOf:
+                 - $ref: "#/components/schemas/id"
+            arrayOfTypeRefs:
+              type: array
+              minItems: 1
+              items:
+                oneOf:
+                  - $ref: "#/components/schemas/refId"
+            arrayOfServiceIds:
+              type: array
+              minItems: 1
+              items:
+                oneOf:
+                 - $ref: "#/components/schemas/id"
+            arrayOfServiceRefs:
+              type: array
+              description: "A szálláshoz tartozó szállás-, szoba- és sportszolgáltatások teljes REST hívása."
+              minItems: 0
               nullable: true
               items:
-                type: string
-                format: uri
-                example: "/data/base/tag/888"
-                description: "A szolgáltatás ID-je"
-            locations:
+                oneOf:
+                  - $ref: "#/components/schemas/refId"
+            arrayOfLocations:
               type: object
               description: |
                 A szállás helye: 
@@ -1362,9 +1392,6 @@ components:
                   * város
                   * régió
                   * GPS koordináták
-              required:
-                - cityID
-                - countryID
               properties:
                 cityID:
                   type: string
@@ -1381,16 +1408,7 @@ components:
                   format: uri
                   example: "/data/locatios/region/668"
                   description: A régió ID-je, ahol a szállás található. Elhagyható.
-            arrayOfDescriptionIDs:
-              type: array
-              minItems: 1
-              description: A szállás leírásait tartlamazó törzsadatok ID-i
-              items:
-                type: string
-                format: uri
-                example: "/data/base/descriptions/556"
-                description: A leírás törzsadat azonosítója. Csak type=description az érvényes
-
+ 
     departuresHead:
       allOf:
         - $ref: "#/components/schemas/refId"
