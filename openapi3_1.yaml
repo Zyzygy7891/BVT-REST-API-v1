@@ -157,6 +157,10 @@ paths:
                     - $ref: "#/components/schemas/description"
                     - $ref: "#/components/schemas/basicData"
                     - $ref: "#/components/schemas/tag"
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
 
@@ -181,14 +185,6 @@ paths:
           allowEmptyValue: true
           description: Amennyiben ez a paraméter jelen van a kérésben és a válasz tartalmaz ID-t értékként, a válaszba bekerül egy ___*RefId___ változó, amely az ID API hívását tartlamazza.
         - in: query
-          name: type
-          schema:
-            type: string
-            enum: [STORNO, ACCOMODATION, CITY, REGION, COUNTY, OPTIONAL_PROGRAM, PROGRAM_SCHEME, DISCOUNT, BASE_DATA, IMAGE, CATERING, ADDITIONAL_ITEM, PROGRAM_TYPE, ACCOMODATION_TYPE, ACCOMODATION_RATE, ACCOMODATION_SERVICE, ROOM_SERVICE, SPORT_SERVICE, TRAVEL_TYPE, ROOM_NAME, QUANTITYNAME, DISCOUNTTYPE, ITEM_ALTERNATIVE_VALUE]
-          required: false
-          allowEmptyValue: false
-          description: A törzsadatok listájának szűkítése az adott törzsadat típusra
-        - in: query
           name: isUpdatedFromTime
           schema:
             $ref: "#/components/schemas/timestamp"
@@ -210,6 +206,10 @@ paths:
                   oneOf:
                   - $ref: "#/components/schemas/serverMessage"
                   - $ref: '#/components/schemas/option'
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
   /data/base/option/{id*}:
@@ -227,6 +227,13 @@ paths:
             type: number
             format: int64
             minimum: 0
+        - in: query
+          name: withRefPath
+          schema:
+            type: boolean
+          required: false
+          allowEmptyValue: true
+          description: Amennyiben ez a paraméter jelen van a kérésben és a válasz tartalmaz ID-t értékként, a válaszba bekerül egy ___*RefId___ változó, amely az ID API hívását tartlamazza.
         - in: header
           name: Authorization
           schema:
@@ -245,6 +252,10 @@ paths:
                   oneOf:
                   - $ref: "#/components/schemas/serverMessage"
                   - $ref: '#/components/schemas/option'
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
 
@@ -269,14 +280,6 @@ paths:
           allowEmptyValue: true
           description: Amennyiben ez a paraméter jelen van a kérésben és a válasz tartalmaz ID-t értékként, a válaszba bekerül egy ___*RefId___ változó, amely az ID API hívását tartlamazza.
         - in: query
-          name: type
-          schema:
-            type: string
-            enum: [STORNO, ACCOMODATION, CITY, REGION, COUNTY, OPTIONAL_PROGRAM, PROGRAM_SCHEME, DISCOUNT, BASE_DATA, IMAGE, CATERING, ADDITIONAL_ITEM, PROGRAM_TYPE, ACCOMODATION_TYPE, ACCOMODATION_RATE, ACCOMODATION_SERVICE, ROOM_SERVICE, SPORT_SERVICE, TRAVEL_TYPE, ROOM_NAME, QUANTITYNAME, DISCOUNTTYPE, ITEM_ALTERNATIVE_VALUE]
-          required: false
-          allowEmptyValue: false
-          description: A törzsadatok listájának szűkítése az adott törzsadat típusra
-        - in: query
           name: isUpdatedFromTime
           schema:
             $ref: "#/components/schemas/timestamp"
@@ -298,6 +301,10 @@ paths:
                   oneOf:
                   - $ref: "#/components/schemas/serverMessage"
                   - $ref: '#/components/schemas/description'
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
   /data/base/description/{id*}:
@@ -315,6 +322,13 @@ paths:
             type: number
             format: int64
             minimum: 0
+        - in: query
+          name: withRefPath
+          schema:
+            type: boolean
+          required: false
+          allowEmptyValue: true
+          description: Amennyiben ez a paraméter jelen van a kérésben és a válasz tartalmaz ID-t értékként, a válaszba bekerül egy ___*RefId___ változó, amely az ID API hívását tartlamazza.
         - in: header
           name: Authorization
           schema:
@@ -333,6 +347,10 @@ paths:
                   oneOf:
                   - $ref: "#/components/schemas/serverMessage"
                   - $ref: '#/components/schemas/description'
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
 
@@ -357,14 +375,6 @@ paths:
           allowEmptyValue: true
           description: Amennyiben ez a paraméter jelen van a kérésben és a válasz tartalmaz ID-t értékként, a válaszba bekerül egy ___*RefId___ változó, amely az ID API hívását tartlamazza.
         - in: query
-          name: type
-          schema:
-            type: string
-            enum: [STORNO, ACCOMODATION, CITY, REGION, COUNTY, OPTIONAL_PROGRAM, PROGRAM_SCHEME, DISCOUNT, BASE_DATA, IMAGE, CATERING, ADDITIONAL_ITEM, PROGRAM_TYPE, ACCOMODATION_TYPE, ACCOMODATION_RATE, ACCOMODATION_SERVICE, ROOM_SERVICE, SPORT_SERVICE, TRAVEL_TYPE, ROOM_NAME, QUANTITYNAME, DISCOUNTTYPE, ITEM_ALTERNATIVE_VALUE]
-          required: false
-          allowEmptyValue: false
-          description: A törzsadatok listájának szűkítése az adott törzsadat típusra
-        - in: query
           name: isUpdatedFromTime
           schema:
             $ref: "#/components/schemas/timestamp"
@@ -386,6 +396,10 @@ paths:
                   oneOf:
                   - $ref: "#/components/schemas/serverMessage"
                   - $ref: '#/components/schemas/basicData'
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
   /data/base/basicData/{id*}:
@@ -403,6 +417,13 @@ paths:
             type: number
             format: int64
             minimum: 0
+        - in: query
+          name: withRefPath
+          schema:
+            type: boolean
+          required: false
+          allowEmptyValue: true
+          description: Amennyiben ez a paraméter jelen van a kérésben és a válasz tartalmaz ID-t értékként, a válaszba bekerül egy ___*RefId___ változó, amely az ID API hívását tartlamazza.
         - in: header
           name: Authorization
           schema:
@@ -421,6 +442,10 @@ paths:
                   oneOf:
                   - $ref: "#/components/schemas/serverMessage"
                   - $ref: '#/components/schemas/basicData'
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
 
@@ -445,14 +470,6 @@ paths:
           allowEmptyValue: true
           description: Amennyiben ez a paraméter jelen van a kérésben és a válasz tartalmaz ID-t értékként, a válaszba bekerül egy ___*RefId___ változó, amely az ID API hívását tartlamazza.
         - in: query
-          name: type
-          schema:
-            type: string
-            enum: [STORNO, ACCOMODATION, CITY, REGION, COUNTY, OPTIONAL_PROGRAM, PROGRAM_SCHEME, DISCOUNT, BASE_DATA, IMAGE, CATERING, ADDITIONAL_ITEM, PROGRAM_TYPE, ACCOMODATION_TYPE, ACCOMODATION_RATE, ACCOMODATION_SERVICE, ROOM_SERVICE, SPORT_SERVICE, TRAVEL_TYPE, ROOM_NAME, QUANTITYNAME, DISCOUNTTYPE, ITEM_ALTERNATIVE_VALUE]
-          required: false
-          allowEmptyValue: false
-          description: A törzsadatok listájának szűkítése az adott törzsadat típusra
-        - in: query
           name: isUpdatedFromTime
           schema:
             $ref: "#/components/schemas/timestamp"
@@ -474,8 +491,13 @@ paths:
                   oneOf:
                   - $ref: "#/components/schemas/serverMessage"
                   - $ref: '#/components/schemas/tag'
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
+
   /data/base/tag/{id*}:
     get:
       summary: A törzsadat(ok) listájának lekérése
@@ -491,6 +513,13 @@ paths:
             type: number
             format: int64
             minimum: 0
+        - in: query
+          name: withRefPath
+          schema:
+            type: boolean
+          required: false
+          allowEmptyValue: true
+          description: Amennyiben ez a paraméter jelen van a kérésben és a válasz tartalmaz ID-t értékként, a válaszba bekerül egy ___*RefId___ változó, amely az ID API hívását tartlamazza.
         - in: header
           name: Authorization
           schema:
@@ -509,6 +538,10 @@ paths:
                   oneOf:
                   - $ref: "#/components/schemas/serverMessage"
                   - $ref: '#/components/schemas/tag'
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
 
@@ -517,7 +550,7 @@ paths:
       tags:
       - helyszínek
       - alapadatok
-      summary: A külömböző típusú helysínek és szállások teljes listája
+      summary: A külömböző típusú helyszínek és szállások teljes listája
       description: |-
         Az utak teljes felépítéséhez az alapadatok adják a gerincet. Az alapadatok a törzsadatokból (*/data/base* hívás alatti hívások) és a lokációkból (*/data/locations* hívás alatti hívások) áll.  
         
@@ -571,6 +604,8 @@ paths:
                     - $ref: "#/components/schemas/accomodation"
                   discriminator:
                     propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
 
@@ -616,8 +651,13 @@ paths:
                   oneOf:
                   - $ref: "#/components/schemas/serverMessage"
                   - $ref: '#/components/schemas/location'
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
+
   /data/locations/city/{id*}:
     get:
       summary: Egy vagy több város lekérése
@@ -658,6 +698,10 @@ paths:
                   oneOf:
                   - $ref: "#/components/schemas/serverMessage"
                   - $ref: '#/components/schemas/location'
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
 
@@ -703,6 +747,10 @@ paths:
                   oneOf:
                   - $ref: "#/components/schemas/serverMessage"
                   - $ref: '#/components/schemas/location'
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
   /data/locations/country/{id*}:
@@ -745,6 +793,10 @@ paths:
                   oneOf:
                   - $ref: "#/components/schemas/serverMessage"
                   - $ref: '#/components/schemas/location'
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
 
@@ -790,6 +842,10 @@ paths:
                   oneOf:
                   - $ref: "#/components/schemas/serverMessage"
                   - $ref: '#/components/schemas/location'
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
   /data/locations/region/{id*}:
@@ -832,6 +888,10 @@ paths:
                   oneOf:
                   - $ref: "#/components/schemas/serverMessage"
                   - $ref: '#/components/schemas/location'
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
 
@@ -877,8 +937,13 @@ paths:
                   oneOf:
                   - $ref: "#/components/schemas/serverMessage"
                   - $ref: '#/components/schemas/accomodation'
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
+
   /data/locations/accomodation/{id*}:
     get:
       summary: Egy vagy több szállás lekérése
@@ -919,49 +984,223 @@ paths:
                   oneOf:
                   - $ref: "#/components/schemas/serverMessage"
                   - $ref: '#/components/schemas/accomodation'
+                  discriminator:
+                    propertyName: type
+                    mapping:
+                      error: "#/components/schemas/serverMessage"
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
 
-    
+  /data/programs:
+    get:
+      tags:
+      - utazási programok
+      - árak
+      summary: Az egyes programsémák teljes listája
+      description: |-
+        Az utazási programok (programsémák) listáját adja vissza.
+        
+        __A hívás azösszes programsémát visszaadja.__ Ezt szűrni a felsorolt paraméterekkel lehet.
+
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Hitelesítési token
+        - in: query
+          name: withRefPath
+          schema:
+            type: boolean
+          required: false
+          allowEmptyValue: true
+          description: Amennyiben ez a paraméter jelen van a kérésben és a válasz tartalmaz ID-t értékként, a válaszba bekerül egy ___*RefId___ változó, amely az ID API hívását tartlamazza.
+        - in: query
+          name: isUpdatedFromTime
+          schema:
+            $ref: "#/components/schemas/timestamp"
+          required: false
+          allowEmptyValue: false
+          description: |
+            A törzsadatok listájának szűkítése csak azokra az adatokra, amelyek a megadott időpont után változtak.  
+            A formátum ISO 8601 időbélyegző  
+            [Internet Date/Time Format syntax description](https://www.rfc-editor.org/rfc/rfc3339#section-5.6)
+      responses:
+        '200':
+          description: A törzsadatok listája
+          content:
+            application/json:
+              schema:
+                type: array
+                minItems: 1
+                uniqueItems: true
+                items:
+                  oneOf:
+                    - $ref: "#/components/schemas/serverMessage" # hibát eredményező kérés esetén
+                    - $ref: "#/components/schemas/programScheme"
+        '401':
+          description: A felhasználónak a híváshoz nincs jogosultsága
 
 
-  # /programs/{id*}:
-  #   parameters:
-  #     - name: programID
-  #       in: path
-  #       description: A program(ok) azonosítója
-  #       required: true
-  #       schema:
-  #         type: integer
-  #         format: int32
-  #         example: 345
-  #     - name: Authorization
-  #       in: header
-  #       schema:
-  #         type: string
-  #       required: true
-  #       description: Hitelesítési token
-  #   get:
-  #     summary: A program(ok) részleteinek lekérése
-  #     tags:
-  #       - utazási programok
-  #       - árak
-  #     responses:
-  #       '200':
-  #         description: Sikeres lekérdezés
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: array
-  #               minItems: 1
-  #               items:
-  #                 oneOf:
-  #                 - $ref: '#/components/schemas/serverMessages'
-  #                 - $ref: '#/components/schemas/progamScheme'
-  #       '401':
-  #         description: A felhasználónak a híváshoz nincs jogosultsága
+  /programs/{id*}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          description: A program(ok) azonosítója
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 345
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Hitelesítési token
+        - in: query
+          name: withRefPath
+          schema:
+            type: boolean
+          required: false
+          allowEmptyValue: true
+          description: Amennyiben ez a paraméter jelen van a kérésben és a válasz tartalmaz ID-t értékként, a válaszba bekerül egy ___*RefId___ változó, amely az ID API hívását tartlamazza.
+        - in: query
+          name: isUpdatedFromTime
+          schema:
+            $ref: "#/components/schemas/timestamp"
+          required: false
+          allowEmptyValue: false
+          description: |
+            A törzsadatok listájának szűkítése csak azokra az adatokra, amelyek a megadott időpont után változtak.  
+            A formátum ISO 8601 időbélyegző  
+            [Internet Date/Time Format syntax description](https://www.rfc-editor.org/rfc/rfc3339#section-5.6)
+      summary: A program(ok) részleteinek lekérése
+      tags:
+        - utazási programok
+        - árak
+      responses:
+        '200':
+          description: Sikeres lekérdezés
+          content:
+            application/json:
+              schema:
+                type: array
+                minItems: 1
+                items:
+                  oneOf:
+                  - $ref: '#/components/schemas/serverMessage'
+                  - $ref: '#/components/schemas/programScheme'
+        '401':
+          description: A felhasználónak a híváshoz nincs jogosultsága
 
-  # /programs/{id*}/prices:
+  /programs/locations/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          description: A lokáció azonosítója
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 6889
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Hitelesítési token
+        - in: query
+          name: withRefPath
+          schema:
+            type: boolean
+          required: false
+          allowEmptyValue: true
+          description: Amennyiben ez a paraméter jelen van a kérésben és a válasz tartalmaz ID-t értékként, a válaszba bekerül egy ___*RefId___ változó, amely az ID API hívását tartlamazza.
+        - in: query
+          name: isUpdatedFromTime
+          schema:
+            $ref: "#/components/schemas/timestamp"
+          required: false
+          allowEmptyValue: false
+          description: |
+            A törzsadatok listájának szűkítése csak azokra az adatokra, amelyek a megadott időpont után változtak.  
+            A formátum ISO 8601 időbélyegző  
+            [Internet Date/Time Format syntax description](https://www.rfc-editor.org/rfc/rfc3339#section-5.6)
+      summary: A program(ok) részleteinek lekérése
+      tags:
+        - utazási programok
+        - árak
+      responses:
+        '200':
+          description: Sikeres lekérdezés
+          content:
+            application/json:
+              schema:
+                type: array
+                minItems: 1
+                items:
+                  oneOf:
+                  - $ref: '#/components/schemas/serverMessage'
+                  - $ref: '#/components/schemas/programScheme'
+        '401':
+          description: A felhasználónak a híváshoz nincs jogosultsága
+  
+  /programs/{id}/prices:
+    get:
+      parameters:
+        - name: id
+          in: path
+          description: A program azonosítója
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 345
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Hitelesítési token
+        - in: query
+          name: withRefPath
+          schema:
+            type: boolean
+          required: false
+          allowEmptyValue: true
+          description: Amennyiben ez a paraméter jelen van a kérésben és a válasz tartalmaz ID-t értékként, a válaszba bekerül egy ___*RefId___ változó, amely az ID API hívását tartlamazza.
+        - in: query
+          name: isUpdatedFromTime
+          schema:
+            $ref: "#/components/schemas/timestamp"
+          required: false
+          allowEmptyValue: false
+          description: |
+            A törzsadatok listájának szűkítése csak azokra az adatokra, amelyek a megadott időpont után változtak.  
+            A formátum ISO 8601 időbélyegző  
+            [Internet Date/Time Format syntax description](https://www.rfc-editor.org/rfc/rfc3339#section-5.6)
+      summary: A program részletes árának lekérése
+      tags:
+        - árak
+        - utazási programok
+      responses:
+        '200':
+          description: Sikeres lekérdezés
+          content:
+            application/json:
+              schema:
+                type: array
+                minItems: 1
+                items:
+                  oneOf:
+                  - $ref: '#/components/schemas/serverMessage'
+                  - $ref: '#/components/schemas/programPrices'
+        '401':
+          description: A felhasználónak a híváshoz nincs jogosultsága
   # /programs/{id}/prices/{departureID*}:
   # /departures/{id*}:
 
@@ -1025,7 +1264,7 @@ components:
             - $ref: "#/components/schemas/timestamp"
         originalCall:
           description: A szerver üzenetet generáló eredeti, `teljes` REST hívás, HTTP metódussal 
-          example: GET https://api.budavartours.hu/v1/data/base/basicDatas/8511
+          example: GET https://api.budavartours.hu/v1/data/base/basicData/8511
           oneOf:
             - $ref: "#/components/schemas/refId"
         status:
@@ -1332,7 +1571,6 @@ components:
         - id
         - title
         - parentId
-        - arrayOfChildrensIds
         - arrayOfDescriptionsIds
         - type
       properties:
@@ -1617,7 +1855,7 @@ components:
           example: 7
           description: A program éjszakáinak száma.
 
-    progamScheme:
+    programScheme:
       description: |
         __UTAZÁSI PROGRAM__  
 
@@ -1783,6 +2021,12 @@ components:
                   example: 43992
                   oneOf:
                     - $ref: "#/components/schemas/id"
+                regionRefId:
+                  description: |
+                    A program dátum-úthossz pár érkezési régiójára mutató API hívás. Csak akkor kerül bele a válaszba, ha az API hívás {withRefPath} paraméterrel érkezik. A {withRefPath} értéke elhagyható.
+                  example: "/data/locations/country/43992"
+                  oneOf:
+                    - $ref: "#/components/schemas/refId"
             arrayOfOtherLocationIds:
               description: A program által érintett város Id-jeinek listája a kiindulási és érkezési helyszínt kivéve. ___Csak városok___!
               type: array
@@ -2026,8 +2270,7 @@ components:
               - discount
             properties:
               departuresHead:
-                oneOf:
-                  - $ref: '#/components/schemas/departuresHead'
+                $ref: '#/components/schemas/departuresHead'
               isBestPriceOfDate:
                 type: boolean
                 example: true
@@ -2271,3 +2514,6 @@ components:
                     example: 349990
                     description: Az adott felár gyerek ára
                     nullable: false
+
+
+
