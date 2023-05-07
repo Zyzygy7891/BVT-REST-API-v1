@@ -1149,7 +1149,60 @@ paths:
         '401':
           description: A felhasználónak a híváshoz nincs jogosultsága
   
-  /programs/{id}/prices:
+  /programs/locations/{id}/prices:
+    get:
+      parameters:
+        - name: id
+          in: path
+          description: A lokáció azonosítója
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 6889
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+          required: true
+          description: Hitelesítési token
+        - in: query
+          name: withRefPath
+          schema:
+            type: boolean
+          required: false
+          allowEmptyValue: true
+          description: Amennyiben ez a paraméter jelen van a kérésben és a válasz tartalmaz ID-t értékként, a válaszba bekerül egy ___*RefId___ változó, amely az ID API hívását tartlamazza.
+        - in: query
+          name: isUpdatedFromTime
+          schema:
+            $ref: "#/components/schemas/timestamp"
+          required: false
+          allowEmptyValue: false
+          description: |
+            A törzsadatok listájának szűkítése csak azokra az adatokra, amelyek a megadott időpont után változtak.  
+            A formátum ISO 8601 időbélyegző  
+            [Internet Date/Time Format syntax description](https://www.rfc-editor.org/rfc/rfc3339#section-5.6)
+      summary: A program(ok) részleteinek lekérése
+      tags:
+        - utazási programok
+        - árak
+      responses:
+        '200':
+          description: Sikeres lekérdezés
+          content:
+            application/json:
+              schema:
+                type: array
+                minItems: 1
+                items:
+                  oneOf:
+                  - $ref: '#/components/schemas/serverMessage'
+                  - $ref: '#/components/schemas/programScheme'
+        '401':
+          description: A felhasználónak a híváshoz nincs jogosultsága
+
+  /programs/{id*}/prices:
     get:
       parameters:
         - name: id
@@ -2514,6 +2567,3 @@ components:
                     example: 349990
                     description: Az adott felár gyerek ára
                     nullable: false
-
-
-
