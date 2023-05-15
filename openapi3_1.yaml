@@ -18,7 +18,7 @@ tags:
   - name: "helyszínek"
     description: Az egyes utazási programokhoz tartozó helyszínek és szállások
 paths:
-  /users:
+  /user:
     get:
       tags:
         - felhasználó
@@ -47,6 +47,7 @@ paths:
           $ref: "#/components/responses/general200"
         "401":
           $ref: "#/components/responses/general401"
+
 
   /users/login:
     post:
@@ -97,6 +98,7 @@ paths:
           $ref: "#/components/responses/general200"
         "401":
           $ref: "#/components/responses/general401"
+
 
   /data/baseData:
     parameters:
@@ -286,6 +288,7 @@ paths:
         "401":
           $ref: "#/components/responses/general401"
 
+
   /data/programs:
     parameters:
       - $ref: "#/components/parameters/tokenAuth"
@@ -431,17 +434,17 @@ paths:
         - utazási programok
         - részletes árak
         - árak
-      summary: Az összes programhoz tartozó összes részletes árlista lekérdezése.
+      summary: Az összes programhoz tartozó, az összes foglalható időponttal rendelkező részletes árlista lekérdezése.
       description: |-
-        __A hívás az összes programhoz tartozó részletes árakat adja vissza.__
+        __A hívás az összes programhoz tartozó, programonként az összes foglalható időponthoz tartozó részletes árlistákat adja vissza.__
         
         Ezt szűrni a felsorolt paraméterekkel lehet.
 
-        ___Részletes árak___: [Indulás, úthossz, ellátás, szoba, kapacitás] térben a részvételi díjak a kötelező felárakkal növelt árainak a listája
+        ___Részletes árlisták___: [Indulás, úthossz, ellátás, szoba, kapacitás] térben a kötelező felárakkal növelt, összes utazóra vontakozó részvételi árainak a listája.
 
       responses:
         "200":
-          description: A részletes árak listája
+          description: Sikeres lekérés
           content:
             application/json:
               schema:
@@ -454,7 +457,7 @@ paths:
           $ref: "#/components/responses/general401"
 
     post:
-      summary: Több programhoz tartozó részletes árlista lekérdezése. A programok ID-ja a kérés BODY-ban felsorolandó.
+      summary: Több programhoz tartozó részletes árlista lekérdezése. A programok, azaz az árlisták ID-ja a kérés BODY-ban felsorolandó.
       tags:
         - egyedi lista
         - utazási programok
@@ -493,14 +496,13 @@ paths:
   /data/prices/{id}:
     parameters:
       - $ref: "#/components/parameters/tokenAuth"
-      - $ref: "#/components/parameters/isUpdatedFrom"
 
     get:
       tags:
         - utazási programok
         - részletes árak
         - árak
-      summary: Egy programhoz tartozó részletes árlistája
+      summary: Egy programhoz tartozó részletes árlista lekérése
       description: |-
         __A hívás egy programhoz tartozó részletes árakat adja vissza.__
         
@@ -508,12 +510,12 @@ paths:
 
         Az {id} paraméter a program id-ja, amihez az árakat lekéred.
 
-        ___Részletes árak___: [Indulás, úthossz, ellátás, szoba, kapacitás] térben a részvételi díjak a kötelező felárakkal növelt árainak a listája
+        ___Részletes árlisták___: [Indulás, úthossz, ellátás, szoba, kapacitás] térben a kötelező felárakkal növelt, összes utazóra vontakozó részvételi árainak a listája.
       parameters:
         - $ref: "#/components/parameters/objectId"
       responses:
         "200":
-          description: A program adatai
+          description: Sikeres lekérés
           content:
             application/json:
               schema:
@@ -523,15 +525,50 @@ paths:
           $ref: "#/components/responses/general401"
 
 
-  /data/prices/deparures:
+  /data/prices/deparures/{id}:
     parameters:
       - $ref: "#/components/parameters/tokenAuth"
-      - $ref: "#/components/parameters/isUpdatedFrom"
+    get:
+      summary: Egy időponthoz tartozó árlista.
+      tags:
+        - időpont árak
+        - részletes árak
+        - árak
+      parameters:
+        -  $ref: "#/components/parameters/objectId"
+  
+      responses:
+        "200":
+          description: Sikeres lekérdezés
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  programSchemeId:
+                    description: Az időpont-árlista pár szülő program ID-ja.
+                    example: 1543
+                    oneOf:
+                      - $ref: "#/components/schemas/id"
+                  prices:
+                    description: Az időponthoz tartozó részletes árak
+                    oneOf:
+                    - $ref: "#/components/schemas/programPrices"
+        "401":
+          $ref: "#/components/responses/general401"
+        "404":
+          $ref: "#/components/responses/base404"
+
+  /data/prices/departures/:
+    parameters:
+    - $ref: "#/components/parameters/tokenAuth"
+    - $ref: "#/components/parameters/isUpdatedFrom"
+
     post:
-      summary: Több programhoz tartozó részletes árlista lekérdezése. A programok ID-ja a kérés BODY-ban felsorolandó.
+      summary: Több indulási időponthoz tartozó részletes árlista lekérdezése. Az időpontok ID-ja a kérés BODY-ban felsorolandó.
       tags:
         - egyedi lista
-        - utazási programok
+        - időpont árak
         - részletes árak
         - árak
       requestBody:
@@ -540,9 +577,10 @@ paths:
             schema:
               type: array
               minItems: 1
+              maxItems: 250 #ne tudja lekérni több program idöpont árait, ez a hívás nem erre való, hanem hogy a sok program 1-1 időpont árát kérje le.
               items:
                 $ref: "#/components/schemas/id"
-              example: [668,574,447,1102,1112,1876]
+              example: [23345600,23345601,23345700,23345701]
 
       responses:
         "200":
@@ -552,79 +590,94 @@ paths:
               schema:
                 type: array
                 minItems: 1
+                maxItems: 250
                 items:
                   oneOf:
                     - $ref: "#/components/schemas/serverMessage"
-                    - $ref: "#/components/schemas/programPrices"
-                  discriminator:
-                    propertyName: type
-                    mapping:
-                      error: "#/components/schemas/serverMessage"
+                    - type: object
+                      properties:
+                        programSchemeId:
+                          description: Az időpont-árlista pár szülő program ID-ja.
+                          example: 1543
+                          oneOf:
+                            - $ref: "#/components/schemas/id"
+                        prices:
+                          description: Az időponthoz tartozó részletes árak
+                          oneOf:
+                          - $ref: "#/components/schemas/programPrices"
 
         "401":
           $ref: "#/components/responses/general401"
+  
+  
+  /history:
+    parameters:
+      - $ref: "#/components/parameters/tokenAuth"
+      - $ref: "#/components/parameters/isUpdatedFrom"
 
-
-
-  /programs/{id*}/prices:
     get:
-      parameters:
-        - name: id
-          in: path
-          description: A program azonosítója
-          required: true
-          schema:
-            type: integer
-            format: int32
-            example: 345
-        - in: header
-          name: Authorization
-          schema:
-            type: string
-          required: true
-          description: Hitelesítési token
-        - in: query
-          name: withRefPath
-          schema:
-            type: boolean
-          required: false
-          allowEmptyValue: true
-          description: Amennyiben ez a paraméter jelen van a kérésben és a válasz tartalmaz ID-t értékként, a válaszba bekerül egy ___*RefId___ változó, amely az ID API hívását tartlamazza.
-        - in: query
-          name: isUpdatedFromTime
-          schema:
-            $ref: "#/components/schemas/timestamp"
-          required: false
-          allowEmptyValue: false
-          description: |
-            A törzsadatok listájának szűkítése csak azokra az adatokra, amelyek a megadott időpont után változtak.  
-            A formátum ISO 8601 időbélyegző  
-            [Internet Date/Time Format syntax description](https://www.rfc-editor.org/rfc/rfc3339#section-5.6)
-      summary: A program részletes árának lekérése
       tags:
-        - árak
-        - utazási programok
+        - változáskezelés 
+      summary: Az utóbbi max. 72 órában megváltozott objektumok és a hozzájuk tartozó API hívások listája.
+
       responses:
         "200":
-          description: Sikeres lekérdezés
+          description: Sikeres lekérés
           content:
             application/json:
               schema:
                 type: array
-                minItems: 1
+                minItems: 0
+                uniqueItems: true
                 items:
-                  oneOf:
-                    - $ref: "#/components/schemas/serverMessage"
-                    - $ref: "#/components/schemas/programPrices"
-        "401":
-          description: A felhasználónak a híváshoz nincs jogosultsága
-  # /programs/{id}/prices/{departureID*}:
-  # /departures/{id*}:
+                  type: object
+                  properties:
+                    lastUpdate:
+                      $ref: "#/components/schemas/timestamp"
+                    callbackRef:
+                      $ref: "#/components/schemas/refId"
+                    type:
+                      type: string
+                      enum: [
+                        ACCOMODATION,
+                        ACCOMODATION_DESCRIPTION,
+                        ACCOMODATION_RATE,
+                        ACCOMODATION_SERVICE,
+                        ACCOMODATION_TYPE,
+                        ADDITIONAL_ITEM,
+                        BASE_DATA,
+                        CATERING,
+                        CITY_DESCRIPTION,
+                        CITY,
+                        COUNTRY,
+                        COUNTY_DESCRIPTION,
+                        DEPARTURE,
+                        DISCOUNT_DESCRIPTION,
+                        DISCOUNT_TYPE,
+                        IMAGE,
+                        ITEM_ALTERNATIVE_VALUE,
+                        OPTIONAL_PROGRAM,
+                        PRICE,
+                        PROGRAM_SCHEME_DESCRIPTION,
+                        PROGRAM_TYPE,
+                        PROGRAMSCHEME,
+                        QUANTITY_NAME,
+                        REGION_DESCRIPTION,
+                        REGION,
+                        ROOM_NAME,
+                        ROOM_SERVICE,
+                        SPORT_SERVICE,
+                        STORNO,
+                        TRAVEL_TYPE
+                      ]
 
-  # /history:
+        "401":
+          $ref: "#/components/responses/general401"
+  
 
 components:
   schemas:
+
     id:
       type: number
       format: int64
@@ -709,7 +762,7 @@ components:
         __Célja:__ olyan adatokat tárolni, amelyek nem kapcsolódnak szorosan az árualaphoz.  
         pl.: Sztornó százalék, HUF-EUR kurzus váltó, stb.  
 
-        __Hívás útvonal:__ /data/baseData/option/
+        __Hívás útvonal:__ /data/baseData/?type=STORNO
       type: object
       required:
         - id
@@ -722,11 +775,6 @@ components:
           example: 844
           oneOf:
             - $ref: "#/components/schemas/id"
-        self:
-          description: A törzsadatra mutató API hívás. Csak akkor kerül bele a válaszba, ha az API hívás {withRefPath} paraméterrel érkezik. A {withRefPath} értéke elhagyható.
-          example: "/data/baseData/option/594"
-          oneOf:
-            - $ref: "#/components/schemas/refId"
         title:
           description: A törzsadat megjelenítésre alkalmas elnevezése.
           example: "Sztornó biztosítás"
@@ -761,7 +809,7 @@ components:
         __Objektumhoz tartozó leírás__
           
         __Célja:__ az egyes objektumokhoz tartozó hosszú leírások tárolása, így a válaszok méretének és a redundéns megjelenítés csökkentése  
-        __Hívás útvonal:__ /data/baseData/description/  
+        __Hívás útvonal:__ /data/baseData/0  
 
         Egy objektumhoz tartozó, kiegészítő információkat tartalmazó, HTML előformázott, escape-t szöveg
       type: object
@@ -776,11 +824,6 @@ components:
           example: 844
           oneOf:
             - $ref: "#/components/schemas/id"
-        self:
-          description: A törzsadatra mutató API hívás. Csak akkor kerül bele a válaszba, ha az API hívás {withRefPath} paraméterrel érkezik. A {withRefPath} értéke elhagyható.
-          example: "/data/baseData/option/594"
-          oneOf:
-            - $ref: "#/components/schemas/refId"
         title:
           description: A törzsadat megjelenítésre alkalmas elnevezése.
           example: "Sztornó biztosítás"
@@ -843,11 +886,6 @@ components:
           example: 844
           oneOf:
             - $ref: "#/components/schemas/id"
-        self:
-          description: A törzsadatra mutató API hívás. Csak akkor kerül bele a válaszba, ha az API hívás {withRefPath} paraméterrel érkezik. A {withRefPath} értéke elhagyható.
-          example: "/data/baseData/option/594"
-          oneOf:
-            - $ref: "#/components/schemas/refId"
         title:
           description: A törzsadat megjelenítésre alkalmas elnevezése.
           example: "Sztornó biztosítás"
@@ -884,10 +922,7 @@ components:
           example: "/data/base/descriptions/556"
           oneOf:
             - $ref: "#/components/schemas/id"
-        descriptionRef:
-          oneOf:
-            - $ref: "#/components/schemas/refId"
-
+    
     tag:
       description: |
         __TÖRZSADAT FAJTA__  
@@ -907,11 +942,6 @@ components:
           example: 844
           oneOf:
             - $ref: "#/components/schemas/id"
-        self:
-          description: A törzsadatra mutató API hívás. Csak akkor kerül bele a válaszba, ha az API hívás {withRefPath} paraméterrel érkezik. A {withRefPath} értéke elhagyható.
-          example: "/data/baseData/option/594"
-          oneOf:
-            - $ref: "#/components/schemas/refId"
         title:
           description: A törzsadat megjelenítésre alkalmas elnevezése.
           example: "Sztornó biztosítás"
@@ -973,6 +1003,808 @@ components:
           example: 14.8
 
     location:
+      description: |
+        __HELYSZÍN__  
+
+        Egy helyszínt jelölő objektum (pl.: város, ország)  
+            
+        A törzsadat fa három szintű (ország / régió / város), így az egyéb szinteket (pl.: POI, városrész) a város alá soroltuk be.  
+
+        __Hívás útvonal:__ /data/locations/
+      type: object
+      required:
+        - id
+        - title
+        - parentId
+        - arrayOfDescriptionsIds
+        - type
+      properties:
+        id:
+          description: A lokáció azonosító Id-ja.
+          example: 9667
+          oneOf:
+            - $ref: "#/components/schemas/id"
+        title:
+          description: A lokáció megjelenítésre alkalmas elnevezése.
+          example: "Magyarország"
+          oneOf:
+            - $ref: "#/components/schemas/title"
+        parentId:
+          description: |
+            A lokáció szülő lokációjának azonosítója.  
+            Amennyiben a lokáció típusa ___ország (COUNTRY)___ vagy ___város (CITY)___, a tulajdonság lehet ___null___. Minden más típus esetén ___kell___ parentId.  
+
+            1 lokációhoz csak 1 szülő tartozhat (fa struktúra miatt).  
+
+            Az egyes lokációknak csak ezen típusú lokációk lehet a szülője:
+
+            ACCOMODATION -> CITY -> REGION -> COUNTRY
+          example: 19923
+          nullable: true
+          oneOf:
+            - $ref: "#/components/schemas/id"
+        arrayOfChildrenIds:
+          description: A lokáció alá besorolt lokációk azonosítója. Csak akkor kerül bele a válaszba, ha az API hívás {withRefPath} paraméterrel érkezik. A {withRefPath} értéke elhagyható.
+          type: array
+          nullable: true
+          minItems: 1
+          example: [11112, 3332, 334]
+          items:
+            oneOf:
+              - $ref: "#/components/schemas/id"
+        arrayOfDescriptionsIds:
+          description: |
+            A lokációhoz tartozó leírások Id-jeinek listája.
+          type: array
+          minItems: 1
+          example: [66754, 4445]
+          items:
+            oneOf:
+              - $ref: "#/components/schemas/id"
+        gallery:
+          type: object
+          description: A lokációhoz tartozó képgalériában található elemek hivatkozásai.
+          required:
+            - arrayOfImages
+            - video
+          properties:
+            arrayOfImages:
+              type: array
+              minItems: 1
+              description: A lokációhoz tartozó képek elérhetőségének és azok leírásainak a listája. A képek a www.budavartours.hu weboldalon található sorrendben vannak a tömbben
+              items:
+                type: object
+                required:
+                  - uri
+                properties:
+                  uri:
+                    type: string
+                    format: uri
+                    nullable: true
+                    description: A kép URI elérhetősége a cdn.budavartours.hu szerveren. A tulajdonság csak akkor ___null___, ha még nincs a programsémához feltöltve kép.
+                    pattern: 'https\:\/\/cdn\.budavartours\.hu\/.*?$'
+                    example: "https://cdn.budavartours.hu/binaries/content/gallery/budavar/programs/programscheme/szlovakia/pozsony/koronazasi-unnepseg-pozsonyban/1280px-eisenstadt_-_schloss_esterhazy.jpg"
+                  descriptionId:
+                    description: A képhez tartozó magyarázó szöveg Id-ja.
+                    example: 93339
+                    oneOf:
+                      - $ref: "#/components/schemas/id"
+        type:
+          type: string
+          enum: [CITY, REGION, COUNTRY]
+          example: "REGION"
+          description: |
+            A törzsadat típusa/csoportja/szülője. Lehetséges értékei:  
+              * __CITY__ - város, városrész, látványosság
+              * __REGION__ - földrajzi, közigazgatási vagy történelmi régió
+              * __COUNTRY__ - független állam, lásd: (https://hu.wikipedia.org/wiki/Kontinensek_%C3%A9s_orsz%C3%A1gok_list%C3%A1ja)
+
+    accomodation:
+      description: |
+        __HELYSZÍN__  
+
+        Egy szállást (pl.: hotel, apartman) jelölő objektum  
+
+        __Célja:__ A törzsadatokból és helyszínekből összerakott szállás és minden tulajdonságát tartalmazó objektum.  
+
+        __Hívás útvonal:__ /data/locations/
+      type: object
+      required:
+        - id
+        - title
+        - ratingId
+        - typeId
+        - arrayOfDescriptionIds
+        - arrayOfServiceIds
+        - locations
+        - type
+      properties:
+        id:
+          description: A szállás azonosító Id-ja.
+          example: 44322
+          oneOf:
+            - $ref: "#/components/schemas/id"
+        title:
+          description: A szállás megjelenítésre alkalmas elnevezése.
+          example: "Gela Apartman"
+          oneOf:
+            - $ref: "#/components/schemas/title"
+        ratingId:
+          description: |
+            A szállás besorolásának törzsadat ID-je. pl.: 5* azonosítója - 872
+            Egy szálláshoz csak egy besorolás tartozhat.
+            Amennyiben a szállás típusa NEM __hotel vagy üdülőfalu__ a tulajdonság értéke lehet ___null___ esetén nincs
+          example: 872
+          nullable: true
+          oneOf:
+            - $ref: "#/components/schemas/id"
+        arrayOfDescriptionIds:
+          description: A szálláshoz tartozó leírások Id-knak a listája.
+          type: array
+          minItems: 1
+          example: [220, 5544]
+          items:
+            oneOf:
+              - $ref: "#/components/schemas/id"
+        typeId:
+          description: |
+            A szállás típusának (pl.: hotel, apartman) törzsadat Id-je.
+          example: 872
+          oneOf:
+            - $ref: "#/components/schemas/id"
+        arrayOfServiceIds:
+          description: |
+            A szálláson igénybe vehető szolgáltatások (szállás-, szoba- és sportszolgáltatások) Id-i.
+          type: array
+          example: [7848, 446, 863, 33326]
+          minItems: 1
+          items:
+            oneOf:
+              - $ref: "#/components/schemas/id"
+        locations:
+          type: object
+          description: |
+            A szállás helye: 
+              * ország
+              * város
+              * régió - ha van
+              * GPS koordináták - ha van
+          required:
+            - cityId
+            - countryId
+          properties:
+            cityId:
+              description: A lokáció azonosító Id-ja.
+              example: 9667
+              oneOf:
+                - $ref: "#/components/schemas/id"
+            cityRefId:
+              type: string
+              format: uri
+              example: "/data/locatios/city/868"
+              description: A város ID-je, ahol a szállás található.
+            countryId:
+              description: A lokáció azonosító Id-ja.
+              example: 9667
+              oneOf:
+                - $ref: "#/components/schemas/id"
+            countryRefId:
+              type: string
+              format: uri
+              example: "/data/locatios/counrty/869"
+              description: Az ország ID-je, ahol a szállás található.
+            regionId:
+              description: A lokáció azonosító Id-ja.
+              example: 9667
+              oneOf:
+                - $ref: "#/components/schemas/id"
+            regionRefId:
+              type: string
+              format: uri
+              example: "/data/locatios/region/668"
+              description: A régió ID-je, ahol a szállás található. Elhagyható.
+            gpsPosition:
+              description: A szállás GPS koordinátái
+              oneOf:
+                - $ref: "#/components/schemas/GPSPosition"
+        gallery:
+          type: object
+          description: A lokációhoz tartozó képgalériában található elemek hivatkozásai.
+          required:
+            - arrayOfImages
+            - video
+          properties:
+            arrayOfImages:
+              type: array
+              minItems: 1
+              description: A lokációhoz tartozó képek elérhetőségének és azok leírásainak a listája. A képek a www.budavartours.hu weboldalon található sorrendben vannak a tömbben
+              items:
+                type: object
+                required:
+                  - uri
+                properties:
+                  uri:
+                    type: string
+                    format: uri
+                    nullable: true
+                    description: A kép URI elérhetősége a cdn.budavartours.hu szerveren. A tulajdonság csak akkor ___null___, ha még nincs a programsémához feltöltve kép.
+                    pattern: 'https\:\/\/cdn\.budavartours\.hu\/.*?$'
+                    example: "https://cdn.budavartours.hu/binaries/content/gallery/budavar/programs/programscheme/szlovakia/pozsony/koronazasi-unnepseg-pozsonyban/1280px-eisenstadt_-_schloss_esterhazy.jpg"
+                  descriptionId:
+                    description: A képhez tartozó magyarázó szöveg Id-ja.
+                    example: 93339
+                    oneOf:
+                      - $ref: "#/components/schemas/id"
+        type:
+          type: string
+          enum: [ACCOMODATION]
+          example: "ACCOMODATION"
+          description: |
+            A szállás típusa/csoportja/szülője. Lehetséges értékei:  
+              * __ACCOMODATION__ - szállás
+
+    departuresHead:
+      description: |
+        __RÉSZOBJEKTUM__
+
+        Egy programsémában lévő indulások főbb paramétereit tartalmazza.  
+        ___Nincs hozzá különálló hívás.___
+      type: object
+      required:
+        - id
+        - dateOfTripStart
+        - dateOfTripEndDate
+        - days
+        - nights
+      properties:
+        id:
+          description: Az indulás azonosító Id-ja.
+          example: 223455
+          oneOf:
+            - $ref: "#/components/schemas/id"
+        dateOfTripStart:
+          description: A turnus indulási dátuma
+          example: "2023-04-20"
+          oneOf:
+            - $ref: "#/components/schemas/dateTimestamp"
+        dateOfTripEndDate:
+          description: A turnus hazaérkezési dátuma
+          example: "2023-04-27"
+          oneOf:
+            - $ref: "#/components/schemas/dateTimestamp"
+        days:
+          type: integer
+          format: int32
+          minimum: 0
+          example: 8
+          description: A program napjainak száma
+        nights:
+          type: integer
+          format: int32
+          minimum: 0
+          example: 7
+          description: A program éjszakáinak száma.
+
+    programPrices:
+      description: |
+        __UTAZÁSI PROGRAM ÁRAK__  
+
+        Egy programsémához tartozó árlista.  
+
+        __Célja:__ Egy programsémához tartozó, - az API kérés pillanatában - foglalható szobák és kapacitások árainak reprezentálása. 
+
+        __Hívás útvonal:__ /data/program/{programId}/prices/
+      type: object
+      required:
+        - id
+        - arrayOfDatesAndPrices
+        - arrayOfAdditionalItems
+      properties:
+        id:
+          description: Az árlista azonosító Id-ja, amely megegyezik a progrmaséma Id-jával.
+          example: 940
+          oneOf:
+            - $ref: "#/components/schemas/id"
+        arrayOfDatesAndPrices:
+          type: array
+          items:
+            description:
+              Egy szálláshoz tartozó, dátum-úthossz-szoba-kapacitás árainak reprezentálása.
+              A felárak (közte az ellátások áraival) egy segédtömbben vannak (arrayOfAdditionalItems).
+            type: object
+            required:
+              - departuresHead
+              - isBestPriceOfDate
+              - arrayOfAdditionalItemIds
+              - arrayOfCateringIds
+              - capacityVector
+              - roomNameId
+              - fullPrice
+              - discount
+            properties:
+              departuresHead:
+                $ref: "#/components/schemas/departuresHead"
+              isBestPriceOfDate:
+                type: boolean
+                example: true
+                description: "Az adott dátum és úthossz legjobb fejenkénti ára vagy sem"
+              arrayOfAdditionalItemIds:
+                type: array
+                minItems: 1
+                description: |
+                  Az adott indulási dátum és úthossz párhoz tartozó felárak listája.  
+                  A lista 'arrayOfAdditionalItems' tömb, az ID a tömb indexe
+                example: [342, 343, 344, 254, 616, 786]
+                items:
+                  oneOf:
+                    - $ref: "#/components/schemas/id"
+              arrayOfCateringIds:
+                type: array
+                description: |
+                  Az adott indulási dátum és úthossz párhoz tartozó ellátások ID-jei
+                minItems: 1
+                example: [879, 414]
+                items:
+                  oneOf:
+                    - $ref: "#/components/schemas/id"
+              capacityVector:
+                type: object
+                required:
+                  - adultsOnMainBed
+                  - adultsOnExtraBed
+                  - childOnExtraBed
+                  - childAges
+                description: |
+                  Az adott árhoz tartozó szobának a kapacitása.
+                example:
+                  {
+                    adultsOnMainBed: 1,
+                    adultsOnExtraBed: 0,
+                    childOnExtraBed: 0,
+                  }
+                properties:
+                  adultsOnMainBed:
+                    type: integer
+                    description: Felnőttek száma főágyon
+                    format: int32
+                    minimum: 1
+                  adultsOnExtraBed:
+                    type: integer
+                    description: Felnőttek száma pótágyon
+                    format: int32
+                    minimum: 0
+                  childOnExtraBed:
+                    type: integer
+                    description: Gyerek száma pótágyon
+                    format: int32
+                    minimum: 0
+                  childAges:
+                    type: array
+                    description: |
+                      A pótágyon lévő gyerek minimum és maximum életkor párja.
+                      pl.: [[2,12],[2,12]] jelentése:
+                      * 1. gyerek 2-12 éves korig számít gyereknek
+                      * 2. gyerek 2-12 éves korig számít gyereknek
+                      [[2,12],[2,6]] jelentése:
+                      * 1. gyerek 2-12 éves korig számít gyereknek
+                      * 2. gyerek 2-6 éves korig számít gyereknek
+                    example: [[2, 12], [2, 12]]
+                    items:
+                      type: array
+                      example: [2, 12]
+                      items:
+                        type: integer
+                        format: int32
+                        minimum: 2
+                        maximum: 18
+              roomNameId:
+                description: A szoba nevének törzsadat ID-je.
+                example: 2385
+                oneOf:
+                  - $ref: "#/components/schemas/id"
+              fullPrice:
+                type: integer
+                description: Az adott időpont-úthossz páron lévő, minden utazót és kötelező felárat tartalmazó, kedvezmény nélküli ár
+                example: 349990
+                format: int64
+                minimum: 0
+              discount:
+                type: object
+                nullable: true
+                required:
+                  - id
+                  - discountedPrice
+                  - typeId
+                  - validUntil
+                properties:
+                  id:
+                    description: "Referencia ID, az admin rendszerben lévő ID-vel megegyezik"
+                    oneOf:
+                      - $ref: "#/components/schemas/id"
+                    example: 4519
+                  discountedPrice:
+                    type: integer
+                    description: Az adott időpont-úthossz páron lévő, kötelező felárat tartalmazó, kedvezményes ár
+                    format: int64
+                    minimum: 0
+                    example: 329490
+                  typeId:
+                    description: Az akció típus (firstminute, lastminute, akció) törzsadatokban lévő ID-ja.
+                    example: 943
+                    oneOf:
+                      - $ref: "#/components/schemas/id"
+                  validUntil:
+                    nullable: true
+                    description: |
+                      Az akció érvényességének végét jelző ISO 8601 formátumú időbélyegző.  
+                      pl.: 2023-07-10 => magyar idő szerint 2023-07-10 23:59:59 után a kedvezményes ár már nem használható, helyette (a következő frissítésig) a 'fullPrice' ár használandó.  
+                      Amennyiben nincs az akciónak lejárata, az érték null
+                    example: "2023-07-10"
+                    oneOf:
+                      - $ref: "#/components/schemas/timestamp"
+        arrayOfAdditionalItems:
+          type: array
+          description: Programsémához tartozó összes felár listája
+          items:
+            type: object
+            required:
+              - id
+              - title
+              - isMandantory
+              - isCountInStorno
+              - isDivisible
+              - unitId
+              - alternativeText
+              - groupId
+              - arrayOfCateringFilterIds
+              - prices
+            properties:
+              id:
+                description: A felár azonosító Id-ja.
+                example: 1940
+                oneOf:
+                  - $ref: "#/components/schemas/id"
+              title:
+                description: A felár megjelenítésre alkalmas elnevezése.
+                example: "Repülőtéri illeték"
+                oneOf:
+                  - $ref: "#/components/schemas/title"
+              isMandantory:
+                type: boolean
+                description: A felár kötelezően hozzászámolandó a részvételi díjhoz vagy sem?
+              isCountInStorno:
+                type: boolean
+                description: A felár bele számolandó a sztornószámítás alapjába vagy sem?
+              isDivisible:
+                type: boolean
+                description: A felár egységeinek a száma módosítható vagy fix?
+              unitId:
+                description: |
+                  A felár egyégének (pl.: /fő/nap, /fő) törzsadat ID-je.
+                example: 22
+                oneOf:
+                  - $ref: "#/components/schemas/id"
+              alternativeText:
+                type: integer
+                description: |
+                  Egy tétel árának szöveges megjelenítése.
+                  pl.: egy tételt ajándékba szeretnénk adni, de a sztornó számításnál bele szeretnénk számolni a sztornóalapba. Ez a tulajdonság a tétel ára helyettt jelenik meg.
+                format: int32
+                minimum: 0
+                maximum: 65535
+              groupId:
+                description: |
+                  Címke a felár csoportosításához (pl.: BBP)
+                  A felár cimke tulajdonságának törzsadat ID-je
+                example: 940
+                oneOf:
+                  - $ref: "#/components/schemas/id"
+              arrayOfCateringFilterIds:
+                type: array
+                description: |
+                  A felár melyik ellátások esetén érvényes. 
+                  Az ellátás törzsadat ID-je
+                example: [620, 488, 233]
+                nullable: true
+                items:
+                  oneOf:
+                    - $ref: "#/components/schemas/id"
+              prices:
+                description: A felár árát leíró objektum, felőtt és gyerek esetén.
+                type: object
+                required:
+                  - adult
+                  - children
+                properties:
+                  adult:
+                    type: integer
+                    format: int64
+                    minimum: 0
+                    example: 349990
+                    description: Az adott felár felnőtt ára
+                    nullable: false
+                  children:
+                    type: integer
+                    format: int64
+                    minimum: 0
+                    example: 349990
+                    description: Az adott felár gyerek ára
+                    nullable: false
+
+    programScheme:
+      description: |
+        __UTAZÁSI PROGRAM__  
+
+        Egy komplett utazást összefogó objektum  
+
+        __Célja:__ A törzsadatokból, lokációkból és időpontokból összerakott ___program áttekintő nézetét létrehozni___.  
+        A programsémához tartozó árazásokat és kapacitásokat nem tartalmazza.   
+
+        __Hívás útvonal:__ /data/program/
+      type: object
+      required:
+        - id
+        - title
+        - arrayOfDepartureDates
+        - locations
+        - arrayOfChildMaxAges
+        - gallery
+        - arrayOfDescriptionIds
+        - programProperties
+      properties:
+        id:
+          description: A programséma azonosító Id-ja.
+          example: 1940
+          oneOf:
+            - $ref: "#/components/schemas/id"
+        title:
+          description: A programséma megjelenítésre alkalmas elnevezése.
+          example: "Gela Apartman debreceni indulással"
+          oneOf:
+            - $ref: "#/components/schemas/title"
+        arrayOfDepartureDates:
+          type: array
+          description: A program indulási dátumai, úthosszai és a hozzájuk tartozó legjobb árak adatai
+          items:
+            type: object
+            allOf:
+              - $ref: "#/components/schemas/departuresHead"
+              - type: object
+                required:
+                  - fullPrice
+                properties:
+                  fullPrice:
+                    type: integer
+                    format: int64
+                    minimum: 0
+                    example: 349990
+                    description: Az adott indulási nap és úthossz esetén a *kötelező elemeket tartalmazó* legolcsóbb foglalható szoba, teljes, fejenkénti ára
+                  discountPrice:
+                    type: integer
+                    format: int64
+                    minimum: 0
+                    example: 319990
+                    description: |
+                      __Amennyiben az adott dátum-úthossz párra van érvényes akció__  
+                      Az adott indulási nap és úthossz esetén a *kötelező elemeket tartalmazó* legolcsóbb foglalható szoba, kedvezményes, fejenkénti ára
+                  discountTypeId:
+                    description: |
+                      __Amennyiben az adott dátum-úthossz párra van érvényes akció__  
+                      Az induláshoz és úthosszhoz tartozó legjobb ár akció típusának ID-je
+                    example: 743
+                    oneOf:
+                      - $ref: "#/components/schemas/id"
+                  discountPriceValidUntil:
+                    description: |
+                      __Amennyiben az adott dátum-úthossz párra van érvényes akció__  
+                      A 'discountPrice' ár érvényessége a lejárata. Az mindig az adott nap 23:59:59-t jelenti.  
+                      pl.: 2023-10-10 = 2023-10-11-én már ___NEM___ lesz érvényes az adott ár
+                    example: "2023-07-10"
+                    oneOf:
+                      - $ref: "#/components/schemas/dateTimestamp"
+        locations:
+          type: object
+          description: |
+            A program által érintett helyszínek listája.  
+            A lista alapja a város, de az egyszerűbb feldolgozás érdekében feltüntetjük az indulási országot és a opcionálisan (nem minden városhoz tartozik régió) a régiót is.
+          required:
+            - departure
+            - arrival
+          properties:
+            departure:
+              description: A program indulásának helyszínét összefogó objektum
+              type: object
+              required:
+                - cityId
+                - countryId
+              properties:
+                cityId:
+                  description: A program indulási város Id-je
+                  example: 556
+                  oneOf:
+                    - $ref: "#/components/schemas/id"
+                countryId:
+                  description: A program indulási ország Id-je. #Ezt az Id-t ki lehetne kalkulálni a cityId által meghatározott objektum arrayOfParentId tömbjéből, de megadni egyszerűbb
+                  example: 1856
+                  oneOf:
+                    - $ref: "#/components/schemas/id"
+                regionId:
+                  description: A program indulási régió Id-je. #Ezt az Id-t ki lehetne kalkulálni a cityId által meghatározott objektum arrayOfParentId tömbjéből, de megadni egyszerűbb
+                  example: 43992
+                  oneOf:
+                    - $ref: "#/components/schemas/id"
+            arrival:
+              type: object
+              description: A program - körutazás esetén az első - cél helyszíne
+              required:
+                - cityId
+                - countryId
+              properties:
+                cityId:
+                  description: A program érkezési város Id-je
+                  example: 556
+                  oneOf:
+                    - $ref: "#/components/schemas/id"
+                countryId:
+                  description: A program érkezési ország Id-je. #Ezt az Id-t ki lehetne kalkulálni a cityId által meghatározott objektum arrayOfParentId tömbjéből, de megadni egyszerűbb
+                  example: 1856
+                  oneOf:
+                    - $ref: "#/components/schemas/id"
+                regionId:
+                  description: A program érkezési régió Id-je. #Ezt az Id-t ki lehetne kalkulálni a cityId által meghatározott objektum arrayOfParentId tömbjéből, de megadni egyszerűbb
+                  example: 43992
+                  oneOf:
+                    - $ref: "#/components/schemas/id"
+            arrayOfOtherLocationIds:
+              description: A program által érintett város Id-jeinek listája a kiindulási és érkezési helyszínt kivéve. ___Csak városok___!
+              type: array
+              minItems: 0
+              items:
+                type: object
+                required:
+                  - cityId
+                properties:
+                  cityId:
+                    description: Az érinett város Id-je
+                    example: 556
+                    oneOf:
+                      - $ref: "#/components/schemas/id"
+        arrayOfChildMaxAges:
+          description: |
+            Az egyes gyerekek maximum életkora.  
+            A tömb a maximum gyerekkapacitással rendelkező szoba maximum életkorait tartalmazza.  
+
+            pl.: `[12,6]` jelentése:  
+
+            * 1. gyerek max. 12 éves korig kaphat gyerekárat, ha már betöltötte a 12. életévét, felnőttenk számít.  
+            * 2. gyerek max. 6 éves korig kaphet gyerekárat, ha már betöltötte a 6. életévét, felnőttnek számít.  
+
+            Ezek az életkor limitek szállásonként globálisan vannak beállítva, nem függenek a szoba típúsától, de a szoba típúsa meghatározza a kapacitást, így meghatároz___hatja___ a maximum gyerek életkort.  
+
+            __FONTOS!__: Tájékoztató jellegű információ. A pontos szobakiosztás, szobakapacitás, gyerek élrtkor az árak táblázatban tételesen fel vannak sorolva!
+          type: array
+          minItems: 1
+          example: [12, 6]
+          items:
+            type: integer
+            format: int32
+            minimum: 2
+            maximum: 18
+        gallery:
+          type: object
+          description: A programsémához tartozó kép- és videogalériában található elemek hivatkozásai.
+          required:
+            - arrayOfImages
+            - video
+          properties:
+            video:
+              type: string
+              format: uri
+              nullable: true
+              description: "A programsémához tartozó video URI címe, amely egy videomegosztó (youtube, vimeo, stb) 'embedd' URL-jét tartalmazza."
+              example: "https://www.youtube.com/embed/yMJu-Vvl71M?enablejsapi=1"
+            arrayOfImages:
+              type: array
+              minItems: 1
+              description: A programhoz tartozó képek elérhetőségének és azok leírásainak a listája. A képek a www.budavartours.hu weboldalon található sorrendben vannak a tömbben
+              items:
+                type: object
+                required:
+                  - uri
+                properties:
+                  uri:
+                    type: string
+                    format: uri
+                    nullable: true
+                    description: A kép URI elérhetősége a cdn.budavartours.hu szerveren. A tulajdonság csak akkor ___null___, ha még nincs a programsémához feltöltve kép.
+                    pattern: 'https\:\/\/cdn\.budavartours\.hu\/.*?$'
+                    example: "https://cdn.budavartours.hu/binaries/content/gallery/budavar/programs/programscheme/szlovakia/pozsony/koronazasi-unnepseg-pozsonyban/1280px-eisenstadt_-_schloss_esterhazy.jpg"
+                  descriptionId:
+                    description: A képhez tartozó magyarázó szöveg Id-ja.
+                    example: 93339
+                    oneOf:
+                      - $ref: "#/components/schemas/id"
+        arrayOfDescriptionIds:
+          description: |
+            A programsémához tartozó leírások. 
+            Legalább kettő ID-t kell tartalmaznia a tömbnek, amelyek:
+              * index 0: bevezető szöveg
+              * index 1-től: részletes programinformációk
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required:
+              - descriptionId
+            properties:
+              descriptionId:
+                description: A programsémához tartozó leírás Id-ja.
+                example: 93339
+                oneOf:
+                  - $ref: "#/components/schemas/id"
+        programProperties:
+          description: |
+            A programséma tulajdonságait felsoroló, összesített listák.  
+
+            Egyas tulajdonságok (pl.: ellátás) a program árazásánál eltérhetnek.  
+
+            Pl.: A szállás év közben csak félpanziós ellátást nyújt, de december 31-én kötelezően fizetendő gálavacsorát is ad. Ezt egy extra ellátásként (félpanzió szilveszteri gálasvacsorával) kezeljük, nem felárként és az árazási adatok között erre hivatkozunk.
+          type: object
+          required:
+            - arrayOfcateringIds
+            - programTypeId
+            - arrayOfTravelModeIds
+            - arrayOfAccomodations
+          properties:
+            arrayOfCateringIds:
+              description: A programsémához tartozó összes (szezonális is) ellátás ID-je.
+              type: array
+              minItems: 1
+              items:
+                type: object
+                required:
+                  - cateringId
+                properties:
+                  cateringId:
+                    description: A programsémához tartozó ellátás Id-ja.
+                    example: 2345
+                    oneOf:
+                      - $ref: "#/components/schemas/id"
+            programTypeId:
+              description: A programsémához tartozó programtípus ID-je.
+              example: 25
+              oneOf:
+                - $ref: "#/components/schemas/id"
+            arrayOfTravelModeIds:
+              type: array
+              minItems: 1
+              description: A programsémához tartozó összes utazási mód ID-je.
+              items:
+                type: object
+                required:
+                  - travelModeId
+                properties:
+                  travelModeId:
+                    description: A programsémához tartozó egy utazási mód ID-je.
+                    example: 25
+                    oneOf:
+                      - $ref: "#/components/schemas/id"
+            arrayOfAccomodationIds:
+              type: array
+              minItems: 1
+              description: A programsémához tartozó szállások ID listája
+              items:
+                type: object
+                required:
+                  - accomodationId
+                properties:
+                  accomodationId:
+                    description: A programsémához tartozó egy szállás ID-je.
+                    example: 2235
+                    oneOf:
+                      - $ref: "#/components/schemas/id"
+
+    location_withRefIds:
       description: |
         __HELYSZÍN__  
 
@@ -1116,8 +1948,238 @@ components:
               * __CITY__ - város, városrész, látványosság
               * __REGION__ - földrajzi, közigazgatási vagy történelmi régió
               * __COUNTRY__ - független állam, lásd: (https://hu.wikipedia.org/wiki/Kontinensek_%C3%A9s_orsz%C3%A1gok_list%C3%A1ja)
+    tag_withRefIds:
+      description: |
+        __TÖRZSADAT FAJTA__  
 
-    accomodation:
+        __Objektum cimkéi__  
+
+        __Célja:__ az egyes objektumokhoz tartozó rövid információk, szövegrészek (pl.: szobanév, szállásbesorolás) tárolása. Ehhez a törzsadathoz _NEM_ tartozik sem leírás, sem érték, csak a megnevezés.
+        __Hívás útvonal:__ /data/base/tag/
+      type: object
+      required:
+        - id
+        - title
+        - type
+      properties:
+        id:
+          description: A törzsadat azonosító Id-ja.
+          example: 844
+          oneOf:
+            - $ref: "#/components/schemas/id"
+        self:
+          description: A törzsadatra mutató API hívás. Csak akkor kerül bele a válaszba, ha az API hívás {withRefPath} paraméterrel érkezik. A {withRefPath} értéke elhagyható.
+          example: "/data/baseData/option/594"
+          oneOf:
+            - $ref: "#/components/schemas/refId"
+        title:
+          description: A törzsadat megjelenítésre alkalmas elnevezése.
+          example: "Sztornó biztosítás"
+          oneOf:
+            - $ref: "#/components/schemas/title"
+        type:
+          type: string
+          enum: [ROOM_NAME, QUANTITYNAME, DISCOUNTTYPE, ITEM_ALTERNATIVE_VALUE]
+          example: "ROOM_NAME"
+          description: |
+            A törzsadat típusa/csoportja/szülője. Lehetséges értékei:  
+            * __ROOMNAME__ - Lakóegység neve. Az egyszerűség miatt NEM bontjuk további tulajdonságokra (pl.: fekvés [kerti], kilátás [tengerre néző], szint [szuperior]), hanem egyben adjuk meg.
+            * __QUANTITYNAME__ - Egy tétel mennyiségjelzője. (pl.: /nap; /fő; /foglalás)
+            * __DISCOUNTTYPE__ - Egy akció típusa. 
+              Jelenleg 4 akciótípus van a rendszerünkben: 
+                - __AKCIÓS__ - nincs az akciónak kiemelt tulajdonsága
+                - __FIRST MINUTE__ - előfoglalási akció
+                - __LAST MINUTE__ - közeli indulású vagy korlátozott foglalhatóságú utakra adott akció
+                - __NINCS AKCIÓBAN__ - "Technikai hack" a katalógus árak időponthoz kötött változtatására. (Pl.: A gyorsan fogyó helyek miatt a referens kéri, hogy 1 hónapig X%-val magasabbak legyenek az árak)  
+            * __ITEM_ALTERNATIVE_VALUE__ - Felárak esetében van egy "Memo" tulajdonság, ami a 0 forintos tételek esetén az ár helyett jelenik meg.  
+              pl.: "0 ft/foglalás" helyett "Ajándék!"  
+              Az ár számítás továbbra is 0 Ft-tal történik.
+    basicData_withRefIds:
+      description: |
+        __TÖRZSADAT FAJTA__  
+
+        __Olyan törzsadatok, amelyek leírással is rendelkeznek__
+
+
+        __Célja:__ Az általános törzsadatok tárolása és a kulcs-érték-leírás hármas öszefogása.  
+        __Hívás útvonal:__ /data/base/basicData/
+      type: object
+      required:
+        - id
+        - title
+        - type
+        - descriptionId
+      properties:
+        id:
+          description: A törzsadat azonosító Id-ja.
+          example: 844
+          oneOf:
+            - $ref: "#/components/schemas/id"
+        self:
+          description: A törzsadatra mutató API hívás. Csak akkor kerül bele a válaszba, ha az API hívás {withRefPath} paraméterrel érkezik. A {withRefPath} értéke elhagyható.
+          example: "/data/baseData/option/594"
+          oneOf:
+            - $ref: "#/components/schemas/refId"
+        title:
+          description: A törzsadat megjelenítésre alkalmas elnevezése.
+          example: "Sztornó biztosítás"
+          oneOf:
+            - $ref: "#/components/schemas/title"
+        type:
+          type: string
+          enum:
+            [
+              CATERING,
+              ADDITIONAL_ITEM,
+              PROGRAM_TYPE,
+              ACCOMODATION_TYPE,
+              ACCOMODATION_RATE,
+              ACCOMODATION_SERVICE,
+              ROOM_SERVICE,
+              SPORT_SERVICE,
+              TRAVEL_TYPE,
+            ]
+          example: "ADDITIONAL_ITEM"
+          description: |
+            A törzsadat típusa/csoportja/szülője. Lehetséges értékei:   
+              * __CATERING__ - Ellátás megnevezése és leírása (pl.: önellátás, reggeli, félpanzió)
+              * __ADDITIONAL_ITEM__ - Felárak megnevezése és leírása (pl.: Elsőbbségi beszállás; Atlasz Classic Kalkulált biztosítás)
+              * __PROGRAM_TYPE__ - Program megnevezése és leírása (pl.: repülőjegy, hajóút, körutazás)
+              * __ACCOMODATION_TYPE__ - Szállástípus megnevezése és leírása (pl.: apartman, hotel, butikhotel)
+              * __ACCOMODATION_RATE__ - Szállásbesorolás megnevezése és leírása (pl.: 2*+, A kategória, 5*)
+              * __ACCOMODATION_SERVICE__ - Szállásszolgáltatás megnevezése és leírása. (pl.: parkoló)
+              * __ROOM_SERVICE__ - Az egyes szobához kapcsolható szolgáltatás megnevezése és leírása. (pl.: medencebár)
+              * __SPORT_SERVICE__ - Szálláson igénybe vehető sport- és wellness szolgáltatások megnevezése és leírása. Ezekbe beletartoznak az szállás szoba- és sportszolgáltatásai is. (pl.: parkoló, medencebár, vasaló)
+              * __TRAVEL_TYPE__ - Utazási mód megnevezése és leírása (pl.: autóbusszal, egyénileg)
+        descriptionId:
+          description: A törzsadat azonosítója. Egy _basicData_ törzsadatnak csak egy leírása lehet
+          example: "/data/base/descriptions/556"
+          oneOf:
+            - $ref: "#/components/schemas/id"
+        descriptionRef:
+          oneOf:
+            - $ref: "#/components/schemas/refId"
+    description_withRefIds:
+      description: |
+        __TÖRZSADAT FAJTA__  
+
+        __Objektumhoz tartozó leírás__
+          
+        __Célja:__ az egyes objektumokhoz tartozó hosszú leírások tárolása, így a válaszok méretének és a redundéns megjelenítés csökkentése  
+        __Hívás útvonal:__ /data/baseData/  
+
+        Egy objektumhoz tartozó, kiegészítő információkat tartalmazó, HTML előformázott, escape-t szöveg
+      type: object
+      required:
+        - id
+        - title
+        - value
+        - type
+      properties:
+        id:
+          description: A törzsadat azonosító Id-ja.
+          example: 844
+          oneOf:
+            - $ref: "#/components/schemas/id"
+        self:
+          description: A törzsadatra mutató API hívás. Csak akkor kerül bele a válaszba, ha az API hívás {withRefPath} paraméterrel érkezik. A {withRefPath} értéke elhagyható.
+          example: "/data/baseData/option/594"
+          oneOf:
+            - $ref: "#/components/schemas/refId"
+        title:
+          description: A törzsadat megjelenítésre alkalmas elnevezése.
+          example: "Sztornó biztosítás"
+          oneOf:
+            - $ref: "#/components/schemas/title"
+        value:
+          description: Maga a HTML előformázott leírás
+          example: |-
+            <p class=""><b class="">1. nap: Budapest-Korfu</b><br>  
+            Elutazás Korfura charterjárattal. Érkezés után transzfer a szállodába. Szabadprogram. Vacsora (amennyiben a program tartalmazza) és szállás Korfun. </p>...
+          nullable: true
+          type: string
+          minLength: 1
+          maxLength: 8192
+        type:
+          type: string
+          enum:
+            [
+              ACCOMODATION,
+              CITY,
+              REGION,
+              COUNTY,
+              OPTIONAL_PROGRAM,
+              PROGRAM_SCHEME,
+              DISCOUNT,
+              BASE_DATA,
+              IMAGE,
+            ]
+          description: |
+            A törzsadat típusa/csoportja/szülője. Lehetséges értékei:   
+              * __ACCOMODATION__ - Szálláshoz tartozó leírás
+              * __CITY__ - Város lokációhoz tartozó leírás
+              * __REGION__ - Régió lokációhoz tartozó leírás
+              * __COUNTY__ - Ország lokációhoz tartozó leírás
+              * __OPTIONAL_PROGRAM__ - Fakultatív programhoz tartozó leírás
+              * __PROGRAM_SCHEME__ - Programsémához tartozó leírás
+              * __DISCOUNT__ - Egy akcióhoz tartozó leírás
+              * __BASE_DATA__ - Törzsadathoz tartozó leírás
+              * __IMAGE__ - Egy programséma képeihez tartozó leírás
+          example: "CITY"
+    option_withRefIds:
+      description: |
+        __TÖRZSADAT FAJTA__  
+
+        __Globális beállítás__  
+          
+        __Célja:__ olyan adatokat tárolni, amelyek nem kapcsolódnak szorosan az árualaphoz.  
+        pl.: Sztornó százalék, HUF-EUR kurzus váltó, stb.  
+
+        __Hívás útvonal:__ /data/baseData/?type=STORNO
+      type: object
+      required:
+        - id
+        - title
+        - value
+        - type
+      properties:
+        id:
+          description: A törzsadat azonosító Id-ja.
+          example: 844
+          oneOf:
+            - $ref: "#/components/schemas/id"
+        self:
+          description: A törzsadatra mutató API hívás. Csak akkor kerül bele a válaszba, ha az API hívás {withRefPath} paraméterrel érkezik. A {withRefPath} értéke elhagyható.
+          example: "/data/baseData/option/594"
+          oneOf:
+            - $ref: "#/components/schemas/refId"
+        title:
+          description: A törzsadat megjelenítésre alkalmas elnevezése.
+          example: "Sztornó biztosítás"
+          oneOf:
+            - $ref: "#/components/schemas/title"
+        value:
+          description: A törzsadat értéke.
+          nullable: true
+          oneOf:
+            - type: string
+              minLength: 1
+              maxLength: 128
+              example: "valami"
+            - type: number
+              format: float
+              example: 0.025
+            - type: number
+              format: int64
+              example: 6
+        type:
+          type: string
+          enum: [STORNO]
+          description: |
+            A törzsadat típusa/csoportja/szülője. Lehetséges értékei:   
+            * __STORNO__ - A Budavár Tours sztornóértéke törtszámként kifejezve (pl.: 0.025)
+          example: "STORNO"
+    accomodation_withRefIds:
       description: |
         __HELYSZÍN__  
 
@@ -1308,50 +2370,7 @@ components:
           description: |
             A szállás típusa/csoportja/szülője. Lehetséges értékei:  
               * __ACCOMODATION__ - szállás
-
-    departuresHead:
-      description: |
-        __RÉSZOBJEKTUM__
-
-        Egy programsémában lévő indulások főbb paramétereit tartalmazza.  
-        ___Nincs hozzá különálló hívás.___
-      type: object
-      required:
-        - id
-        - dateOfTripStart
-        - dateOfTripEndDate
-        - days
-        - nights
-      properties:
-        id:
-          description: Az indulás azonosító Id-ja.
-          example: 223455
-          oneOf:
-            - $ref: "#/components/schemas/id"
-        dateOfTripStart:
-          description: A turnus indulási dátuma
-          example: "2023-04-20"
-          oneOf:
-            - $ref: "#/components/schemas/dateTimestamp"
-        dateOfTripEndDate:
-          description: A turnus hazaérkezési dátuma
-          example: "2023-04-27"
-          oneOf:
-            - $ref: "#/components/schemas/dateTimestamp"
-        days:
-          type: integer
-          format: int32
-          minimum: 0
-          example: 8
-          description: A program napjainak száma
-        nights:
-          type: integer
-          format: int32
-          minimum: 0
-          example: 7
-          description: A program éjszakáinak száma.
-
-    programScheme:
+    programScheme_withRefIds:
       description: |
         __UTAZÁSI PROGRAM__  
 
@@ -1722,8 +2741,7 @@ components:
                     example: "/data/locations/accomodation/2235"
                     oneOf:
                       - $ref: "#/components/schemas/refId"
-
-    programPrices:
+    programPrices_withRefIds:
       description: |
         __UTAZÁSI PROGRAM ÁRAK__  
 
