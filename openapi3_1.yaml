@@ -431,7 +431,6 @@ paths:
 
     get:
       tags:
-        - utazási programok
         - részletes árak
         - árak
       summary: Az összes programhoz tartozó, az összes foglalható időponttal rendelkező részletes árlista lekérdezése.
@@ -460,7 +459,6 @@ paths:
       summary: Több programhoz tartozó részletes árlista lekérdezése. A programok, azaz az árlisták ID-ja a kérés BODY-ban felsorolandó.
       tags:
         - egyedi lista
-        - utazási programok
         - részletes árak
         - árak
       requestBody:
@@ -499,7 +497,6 @@ paths:
 
     get:
       tags:
-        - utazási programok
         - részletes árak
         - árak
       summary: Egy programhoz tartozó részletes árlista lekérése
