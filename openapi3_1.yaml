@@ -48,7 +48,6 @@ paths:
         "401":
           $ref: "#/components/responses/general401"
 
-
   /users/login:
     post:
       tags:
@@ -1819,10 +1818,13 @@ components:
                       - $ref: "#/components/schemas/id"
 
   responses:
+    
     "general200":
       description: Sikeres lekérés
+    
     "general401":
       description: A felhasználónak a híváshoz nincs jogosultsága
+    
     "base404":
       description:  Az __adott típusú__ objektum nem található a megadott ID-vel.
       content:
